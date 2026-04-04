@@ -2870,7 +2870,20 @@
                                 <span id="checkout-total">$0.00</span>
                             </div>
                         </div>
-                        
+                        <!-- PAYMENT NOTE - Add this entire block here -->
+<div style="background: #e8e8d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; border-left: 4px solid #757331;">
+    <i class="fas fa-info-circle" style="color: #757331; margin-right: 8px;"></i>
+    <strong style="color: #757331;">How to pay:</strong>
+    <span style="color: #5a5a3a;"> Congratulations on your order; upon your completion, we will send you a PayPal invoice to your email address. You can pay securely with credit card or PayPal account. Thank you for celebrating Afghan culture with your purchase from Suraya's Artistry! 🦢</span>
+</div>
+
+<!-- THEN the existing checkout buttons -->
+<div class="checkout-buttons">
+    <button type="submit" class="checkout-confirm-btn" id="complete-payment">
+        <i class="fas fa-lock"></i> Complete Payment
+    </button>
+    <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
+</div>
                         <div class="checkout-buttons">
                             <button type="submit" class="checkout-confirm-btn" id="complete-payment">
                                 <i class="fas fa-lock"></i> Complete Payment
