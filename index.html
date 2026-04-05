@@ -5326,11 +5326,14 @@
         init();
             // FIX: Complete Payment Button
 const paymentButton = document.getElementById('complete-payment');
+        
+/// FIX: Complete Payment Button
+const paymentButton = document.getElementById('complete-payment');
 if (paymentButton) {
     paymentButton.onclick = function(e) {
         e.preventDefault();
         
-        // Get customer info from input fields (use .value, not .textContent)
+        // Get customer info from input fields
         const firstName = document.getElementById('firstName') ? document.getElementById('firstName').value : '';
         const lastName = document.getElementById('lastName') ? document.getElementById('lastName').value : '';
         const email = document.getElementById('email') ? document.getElementById('email').value : '';
@@ -5355,7 +5358,7 @@ if (paymentButton) {
         });
         const total = subtotal + 2.99;
         
-        // Show order confirmation (use backticks ` ` for variables)
+        // Show order confirmation
         alert(`✅ ORDER RECEIVED!\n\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nAddress: ${address}\n\nTotal: $${total.toFixed(2)}\n\n📧 We will send a PayPal invoice to ${email} within 24 hours.\n\nThank you for supporting Afghan artistry! 🦢`);
         
         // Clear cart
@@ -5371,6 +5374,8 @@ if (paymentButton) {
         if (document.getElementById('lastName')) document.getElementById('lastName').value = '';
         if (document.getElementById('email')) document.getElementById('email').value = '';
         if (document.getElementById('address')) document.getElementById('address').value = '';
+        if (document.getElementById('city')) document.getElementById('city').value = '';
+        if (document.getElementById('zip')) document.getElementById('zip').value = '';
     };
 }
     </script>
