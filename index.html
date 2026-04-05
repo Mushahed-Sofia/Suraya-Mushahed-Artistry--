@@ -5329,41 +5329,39 @@
     if (paymentButton) {
         paymentButton.onclick = function(e) {
             e.preventDefault();
-            
-            // Get customer info
-            const firstName = document.getElementById('first-name') ? document.getElementById('first-name').value : '';
-            const lastName = document.getElementById('last-name') ? document.getElementById('last-name').value : '';
-            const email = document.getElementById('email') ? document.getElementById('email').value : '';
-            const address = document.getElementById('address') ? document.getElementById('address').value : '';
-            
-            if (!firstName || !email) {
-                alert('Please fill in your first name and email');
-                return;
-            }
-            
-            if (cart.length === 0) {
-                alert('Your cart is empty');
-                return;
-            }
-            
-            // Calculate total
-            let subtotal = 0;
-            cart.forEach(item => {
-                subtotal += item.price * item.quantity;
-            });
-            const total = subtotal + 2.99;
-            
-            // Show order confirmation
-            alert(`✅ ORDER RECEIVED!\n\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nAddress: ${address}\n\nTotal: $${total.toFixed(2)}\n\n📧 We will send a PayPal invoice to ${email} within 24 hours.\n\nThank you for supporting Afghan artistry! 🦢`);
-            
-            // Clear cart
-            cart = [];
-            if (typeof updateCart === 'function') updateCart();
-            
-            // Close checkout form if it exists
-            const checkoutForm = document.getElementById('checkout-form');
-            if (checkoutForm) checkoutForm.style.display = 'none';
-        };
+              // Get customer info
+    const firstName = document.getElementById('firstName') ? document.getElementById('firstName').value : '';
+    const lastName = document.getElementById('lastName') ? document.getElementById('lastName').value : '';
+    const email = document.getElementById('email') ? document.getElementById('email').value : '';
+    const address = document.getElementById('address') ? document.getElementById('address').value : '';
+    
+    if (!firstName || !email) {
+        alert('Please fill in your first name and email');
+        return;
+    }
+    
+    if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
+    }
+    
+    // Calculate total
+    let subtotal = 0;
+    cart.forEach(item => {
+        subtotal += item.price * item.quantity;
+    });
+    const total = subtotal + 2.99;  // ✅ Fixed: use 'total' not 'subtotal' again
+    
+    // Show order confirmation
+    alert(`✅ ORDER RECEIVED!\n\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nAddress: ${address}\nTotal: $${total.toFixed(2)}\n\n📧 We will send a PayPal invoice to ${email} within 24 hours.\n\nThank you for supporting Afghan artistry! 🦢`);
+    
+    // Clear cart
+    cart = [];
+    if (typeof updateCart === 'function') updateCart();
+    
+    // Close checkout form if it exists
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) checkoutForm.style.display = 'none';
     }
     </script>
 </body>
