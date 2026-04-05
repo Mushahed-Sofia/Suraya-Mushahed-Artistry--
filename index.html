@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+I got this version of the the code I can you conform that is good and has all of the configuration <!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Add security-related meta tags -->
@@ -41,7 +41,7 @@
             height: 100vh;
             width: 100%;
             background: linear-gradient(rgba(194, 194, 138, 0.8), rgb(59, 57, 0)), 
-                        url('IMG_8806.jpg');
+                        url('/suraya/suraya.art/IMG_8806.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -2870,35 +2870,17 @@
                                 <span id="checkout-total">$0.00</span>
                             </div>
                         </div>
-
-                        <div class="checkout-summary">
-    <h3>Order Summary</h3>
-    <div id="checkout-items">
-        <!-- Checkout items will be loaded dynamically -->
-    </div>
-    <div class="checkout-summary-item">
-        <span>Shipping:</span>
-        <span id="checkout-shipping">$2.99</span>
-    </div>
-    <div class="checkout-summary-item checkout-summary-total">
-        <span>Total:</span>
-        <span id="checkout-total">$0.00</span>
-    </div>
-
-  <!-- PAYMENT NOTE -->
-<div style="background: #e8e8d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; border-left: 4px solid #757331;">
-    <i class="fas fa-info-circle" style="color: #757331; margin-right: 8px;"></i>
-    <strong style="color: #757331;">How to pay:</strong>
-    <span style="color: #5a5a3a;"> Congratulations on your order; upon your completion, we will send you a PayPal invoice to your email address. You can pay securely with credit card or PayPal account. Thank you for celebrating Afghan culture with your purchase from Suraya's Artistry! 🦢</span>
-</div>
-
-<div class="checkout-buttons">
-    <button type="submit" class="checkout-confirm-btn" id="complete-payment">
-        <i class="fas fa-lock"></i> Complete Payment
-    </button>
-    <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
-</div>
-                     
+                        
+                        <div class="checkout-buttons">
+                            <button type="submit" class="checkout-confirm-btn" id="complete-payment">
+                                <i class="fas fa-lock"></i> Complete Payment
+                            </button>
+                            <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
             <div class="tab-content" id="admin-tab">
                 <div class="admin-panel" id="admin-panel">
                     <h2 class="admin-title">Add New Sticker</h2>
@@ -3007,132 +2989,57 @@
     </footer>
 
     <script>
-    // Stickers data
-    let stickers = [
-        { id: 1, title: "Traditional Mosque", price: 4.99, image: "https://images.unsplash.com/photo-1601597119242-8d2bb8db15ad?w=400", description: "Beautiful Afghan mosque architecture." },
-        { id: 2, title: "Cultural Symbol", price: 3.99, image: "https://images.unsplash.com/photo-1585837814269-6630d4c7bfc2?w=400", description: "Symbol of Afghan resilience." },
-        { id: 3, title: "Peace & Heritage", price: 5.99, image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=400", description: "Dove of peace with traditional patterns." },
-        { id: 4, title: "Afghan Star", price: 4.49, image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=400", description: "Traditional Afghan star pattern." }
-    ];
-    
-    let cart = [];
-    let currentUser = null;
-    
-    // Render stickers
-    function renderStickers() {
-        const grid = document.getElementById('stickerGrid');
-        if (!grid) return;
-        grid.innerHTML = stickers.map(sticker => `
-            <div class="sticker-card">
-                <div class="sticker-img"><img src="${sticker.image}" alt="${sticker.title}"></div>
-                <div class="sticker-info">
-                    <h3 class="sticker-title">${sticker.title}</h3>
-                    <p>${sticker.description}</p>
-                    <div class="sticker-price">$${sticker.price}</div>
-                    <button class="add-cart-btn" data-id="${sticker.id}">Add to Cart</button>
-                </div>
-            </div>
-        `).join('');
-        
-        document.querySelectorAll('.add-cart-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(btn.dataset.id);
-                const sticker = stickers.find(s => s.id === id);
-                const existing = cart.find(i => i.id === id);
-                if (existing) existing.quantity++;
-                else cart.push({ ...sticker, quantity: 1 });
-                updateCart();
-                alert(`Added ${sticker.title} to cart`);
-            });
-        });
-    }
-    
-    function updateCart() {
-        const cartDiv = document.getElementById('cartItems');
-        const totalSpan = document.getElementById('cartTotal');
-        if (!cartDiv) return;
-        if (cart.length === 0) {
-            cartDiv.innerHTML = '<p>Your cart is empty</p>';
-            totalSpan.innerText = '$0.00';
-            return;
-        }
-        let total = 0;
-        cartDiv.innerHTML = cart.map(item => {
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
-            return `<div style="display:flex; justify-content:space-between;"><span>${item.title} x${item.quantity}</span><span>$${itemTotal.toFixed(2)}</span></div>`;
-        }).join('');
-        totalSpan.innerText = `$${(total + 2.99).toFixed(2)}`;
-    }
-    
-    // Auth
-    const authBtn = document.getElementById('authBtn');
-    const authModal = document.getElementById('authModal');
-    const userProfile = document.getElementById('userProfile');
-    const userNameSpan = document.getElementById('userName');
-    
-    authBtn.onclick = () => authModal.classList.toggle('active');
-    
-    document.getElementById('doLogin').onclick = () => {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        if (email && password) {
-            currentUser = { email, name: email.split('@')[0] };
-            authBtn.style.display = 'none';
-            userProfile.classList.add('active');
-            userNameSpan.innerText = currentUser.name;
-            authModal.classList.remove('active');
-            alert('Logged in! (Demo mode)');
-        } else alert('Enter email and password');
-    };
-    
-    document.getElementById('doSignup').onclick = () => {
-        const name = document.getElementById('signupName').value;
-        const email = document.getElementById('signupEmail').value;
-        const password = document.getElementById('signupPassword').value;
-        if (name && email && password) {
-            currentUser = { email, name };
-            authBtn.style.display = 'none';
-            userProfile.classList.add('active');
-            userNameSpan.innerText = name;
-            authModal.classList.remove('active');
-            alert(`Welcome ${name}! (Demo mode)`);
-        } else alert('Fill all fields');
-    };
-    
-    document.getElementById('logoutBtn').onclick = () => {
-        currentUser = null;
-        authBtn.style.display = 'block';
-        userProfile.classList.remove('active');
-        cart = [];
-        updateCart();
-        alert('Logged out');
-    };
-    
-    // Checkout
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const checkoutForm = document.getElementById('checkoutForm');
-    const cancelCheckout = document.getElementById('cancelCheckout');
-    const completePayment = document.getElementById('completePayment');
-    
-    checkoutBtn.onclick = () => {
-        if (!currentUser) { alert('Please login first'); authModal.classList.add('active'); return; }
-        if (cart.length === 0) { alert('Cart is empty'); return; }
-        checkoutForm.style.display = 'block';
-    };
-    
-    cancelCheckout.onclick = () => { checkoutForm.style.display = 'none'; };
-    
-    completePayment.onclick = () => {
-        const firstName = document.getElementById('firstName').value;
-        const email = document.getElementById('email').value;
-        if (!firstName || !email) { alert('Please fill required fields'); return; }
-        alert(`✅ Order placed! We'll send a PayPal invoice to ${email}. Thank you for supporting Afghan artistry!`);
-        cart = [];
-        updateCart();
-        checkoutForm.style.display = 'none';
-    };
-    
+        // Store for stickers, gallery items, and cart
+        let stickers = [
+            {
+                id: 1,
+                title: "Traditional Mosque",
+                price: 4.99,
+                icon: "fas fa-mosque",
+                description: "Beautiful Afghan mosque architecture with intricate details and patterns.",
+                color: "#757331",
+                image: "https://images.unsplash.com/photo-1601597119242-8d2bb8db15ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                caption: "Traditional Afghan Mosque Art",
+                limitedEdition: false,
+                customImage: null
+            },
+            {
+                id: 2,
+                title: "Cultural Symbol",
+                price: 3.99,
+                icon: "fas fa-star-and-crescent",
+                description: "Symbolic representation of Afghan culture with traditional patterns.",
+                color: "#757331",
+                image: "https://images.unsplash.com/photo-1585837814269-6630d4c7bfc2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                caption: "Cultural Symbols of Afghanistan",
+                limitedEdition: true,
+                customImage: null
+            },
+            {
+                id: 3,
+                title: "Peace & Heritage",
+                price: 5.99,
+                icon: "fas fa-dove",
+                description: "Dove of peace combined with traditional Afghan patterns.",
+                color: "#757331",
+                image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                caption: "Peace and Heritage Design",
+                limitedEdition: false,
+                customImage: null
+            },
+            {
+                id: 4,
+                title: "Afghan Star",
+                price: 4.49,
+                icon: "fas fa-star",
+                description: "Traditional Afghan star pattern with vibrant colors.",
+                color: "#757331",
+                image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                caption: "Traditional Star Pattern",
+                limitedEdition: true,
+                customImage: null
+            }
+        ];
 
         let cart = [];
         const shippingCost = 2.99;
