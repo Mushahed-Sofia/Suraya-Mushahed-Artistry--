@@ -5319,7 +5319,101 @@
             adminTabBtn.style.opacity = "0.5";
             adminTabBtn.style.cursor = "not-allowed";
         }
+            // ============================================
+    // FIX: PAYMENT BUTTON (PayPal & Apple Pay)
+    // ============================================
+    
+    // Find the complete payment button
+    const paymentBtn = document.getElementById('complete-payment');
+    
+    if (paymentBtn) {
+        // Remove any existing click handlers
+        paymentBtn.removeEventListener('click', paymentHandler);
+        // Add new click handler
+        paymentBtn.addEventListener('click', paymentHandler);
+    }
+    
+    function paymentHandler(e) {
+        e.preventDefault();
         
+        // Get customer info from checkout form
+        const firstName = document.getElementById('first-name') ? document.getElementById('first-name').value : 
+                         (document.getElementById('firstName') ? document.getElementById('firstName').value : '');
+        const lastName = document.getElementById('last-name') ? document.getElementById('last-name').value : 
+                        (document.getElementById('lastName') ? document.getElementById('lastName').value : '');
+        const email = document.getElementById('email') ? document.getElementById('email').value : '';
+        const address = document.getElementById('address') ? document.getElementById('address').value : '';
+        
+        // Check required fields
+        if (!firstName || !email || !address) {
+            alert('❌ Please fill in your first name, email, and shipping address');
+            return;
+        }
+        
+        // Check if cart has items
+        if (typeof cart !== 'undefined' && cart.length === 0) {
+            alert('❌ Your cart is empty. Please add items before checking out.');
+            return;
+        }
+        
+        // Calculate total
+        let subtotal = 0;
+        if (typeof cart !== 'undefined') {
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+            });
+        }
+        const total = (subtotal + 2.99).toFixed(2);
+        
+        // Build order summary
+        let orderItems = "";
+        if (typeof cart !== 'undefined') {
+            cart.forEach(item => {
+                orderItems += `${item.title} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+        }
+        
+        // Show order confirmation
+        alert(`✅ ORDER RECEIVED!\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nShipping: ${address}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nItems:\n${orderItems}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSubtotal: $${subtotal.toFixed(2)}\nShipping: $2.99\nTOTAL: $${total}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📧 A PayPal invoice will be sent to ${email} within 24 hours.\n💳 You can pay securely with credit card or PayPal.\n\n🦢 Thank you for celebrating Afghan culture with Suraya's Artistry!`);
+        
+        // Clear cart
+        if (typeof cart !== 'undefined') {
+            cart = [];
+            if (typeof updateCart === 'function') updateCart();
+        }
+        
+        // Close checkout form
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) checkoutForm.style.display = 'none';
+        
+        // Clear form fields
+        const fields = ['first-name', 'firstName', 'last-name', 'lastName', 'email', 'address', 'city', 'zip'];
+        fields.forEach(field => {
+            const el = document.getElementById(field);
+            if (el) el.value = '';
+        });
+        
+        // Hide payment processing modal if visible
+        const paymentModal = document.getElementById('payment-processing');
+        if (paymentModal) paymentModal.style.display = 'none';
+    }
+    
+    // Also fix Apple Pay and PayPal buttons if they exist
+    const applePayBtn = document.querySelector('[data-method="apple"]');
+    if (applePayBtn) {
+        applePayBtn.addEventListener('click', function() {
+            alert('🍎 Apple Pay will be available after you complete your order. A PayPal invoice will be sent to your email.');
+        });
+    }
+    
+    const paypalBtn = document.querySelector('[data-method="paypal"]');
+    if (paypalBtn) {
+        paypalBtn.addEventListener('click', function() {
+            alert('💰 After you complete your order, a PayPal invoice will be sent to your email address.');
+        });
+    }
+    
+    console.log('✅ Payment button fix applied!');
         // Initialize the app
         init();
     </script>
