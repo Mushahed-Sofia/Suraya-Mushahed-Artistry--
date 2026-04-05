@@ -5319,6 +5319,80 @@
             adminTabBtn.style.opacity = "0.5";
             adminTabBtn.style.cursor = "not-allowed";
         }
+            // Initialize admin tab button state
+            adminTabBtn.disabled = true;
+            adminTabBtn.style.opacity = "0.5";
+            adminTabBtn.style.cursor = "not-allowed";
+        }
+        
+        // ============================================
+        // FIX: PAYMENT BUTTON (PayPal & Apple Pay)
+        // ============================================
+        
+        // Find the complete payment button and add click handler
+        const paymentFixBtn = document.getElementById('complete-payment');
+        
+        if (paymentFixBtn) {
+            paymentFixBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get customer info from checkout form
+                const firstName = document.getElementById('first-name') ? document.getElementById('first-name').value : '';
+                const lastName = document.getElementById('last-name') ? document.getElementById('last-name').value : '';
+                const email = document.getElementById('email') ? document.getElementById('email').value : '';
+                const address = document.getElementById('address') ? document.getElementById('address').value : '';
+                
+                // Check required fields
+                if (!firstName || !email || !address) {
+                    alert('❌ Please fill in your first name, email, and shipping address');
+                    return;
+                }
+                
+                // Check if cart has items
+                if (cart.length === 0) {
+                    alert('❌ Your cart is empty. Please add items before checking out.');
+                    return;
+                }
+                
+                // Calculate total
+                let subtotal = 0;
+                cart.forEach(item => {
+                    subtotal += item.price * item.quantity;
+                });
+                const total = (subtotal + 2.99).toFixed(2);
+                
+                // Build order summary
+                let orderItems = "";
+                cart.forEach(item => {
+                    orderItems += `${item.title} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}\n`;
+                });
+                
+                // Show order confirmation
+                alert(`✅ ORDER RECEIVED!\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nShipping: ${address}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nItems:\n${orderItems}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSubtotal: $${subtotal.toFixed(2)}\nShipping: $2.99\nTOTAL: $${total}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📧 A PayPal invoice will be sent to ${email} within 24 hours.\n💳 You can pay securely with credit card or PayPal.\n\n🦢 Thank you for celebrating Afghan culture with Suraya's Artistry!`);
+                
+                // Clear cart
+                cart = [];
+                updateCart();
+                
+                // Close checkout form
+                const checkoutFormElement = document.getElementById('checkout-form');
+                if (checkoutFormElement) checkoutFormElement.style.display = 'none';
+                
+                // Clear form fields
+                const formFields = ['first-name', 'last-name', 'email', 'address', 'city', 'zip'];
+                formFields.forEach(field => {
+                    const fieldElement = document.getElementById(field);
+                    if (fieldElement) fieldElement.value = '';
+                });
+            });
+        }
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
+        
             // ============================================
     // FIX: PAYMENT BUTTON (PayPal & Apple Pay)
     // ============================================
