@@ -5325,44 +5325,54 @@
         // Initialize the app
         init();
             // FIX: Complete Payment Button
-    const paymentButton = document.getElementById('complete-payment');
-    if (paymentButton) {
-        paymentButton.onclick = function(e) {
-            e.preventDefault();
-              // Get customer info
-    const firstName = document.getElementById('firstName') ? document.getElementById('firstName').value : '';
-    const lastName = document.getElementById('lastName') ? document.getElementById('lastName').value : '';
-    const email = document.getElementById('email') ? document.getElementById('email').value : '';
-    const address = document.getElementById('address') ? document.getElementById('address').value : '';
-    
-    if (!firstName || !email) {
-        alert('Please fill in your first name and email');
-        return;
-    }
-    
-    if (cart.length === 0) {
-        alert('Your cart is empty');
-        return;
-    }
-    
-    // Calculate total
-    let subtotal = 0;
-    cart.forEach(item => {
-        subtotal += item.price * item.quantity;
-    });
-    const total = subtotal + 2.99;  // ✅ Fixed: use 'total' not 'subtotal' again
-    
-    // Show order confirmation
-    alert(`✅ ORDER RECEIVED!\n\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nAddress: ${address}\nTotal: $${total.toFixed(2)}\n\n📧 We will send a PayPal invoice to ${email} within 24 hours.\n\nThank you for supporting Afghan artistry! 🦢`);
-    
-    // Clear cart
-    cart = [];
-    if (typeof updateCart === 'function') updateCart();
-    
-    // Close checkout form if it exists
-    const checkoutForm = document.getElementById('checkout-form');
-    if (checkoutForm) checkoutForm.style.display = 'none';
-    }
+const paymentButton = document.getElementById('complete-payment');
+if (paymentButton) {
+    paymentButton.onclick = function(e) {
+        e.preventDefault();
+        
+        // Get customer info from input fields (use .value, not .textContent)
+        const firstName = document.getElementById('firstName') ? document.getElementById('firstName').value : '';
+        const lastName = document.getElementById('lastName') ? document.getElementById('lastName').value : '';
+        const email = document.getElementById('email') ? document.getElementById('email').value : '';
+        const address = document.getElementById('address') ? document.getElementById('address').value : '';
+        
+        // Check if fields are filled
+        if (!firstName || !email || !address) {
+            alert('Please fill in your first name, email, and address');
+            return;
+        }
+        
+        // Check if cart has items
+        if (cart.length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+        
+        // Calculate total
+        let subtotal = 0;
+        cart.forEach(item => {
+            subtotal += item.price * item.quantity;
+        });
+        const total = subtotal + 2.99;
+        
+        // Show order confirmation (use backticks ` ` for variables)
+        alert(`✅ ORDER RECEIVED!\n\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nAddress: ${address}\n\nTotal: $${total.toFixed(2)}\n\n📧 We will send a PayPal invoice to ${email} within 24 hours.\n\nThank you for supporting Afghan artistry! 🦢`);
+        
+        // Clear cart
+        cart = [];
+        if (typeof updateCart === 'function') updateCart();
+        
+        // Close checkout form
+        const checkoutForm = document.getElementById('checkout-form');
+        if (checkoutForm) checkoutForm.style.display = 'none';
+        
+        // Clear form fields
+        if (document.getElementById('firstName')) document.getElementById('firstName').value = '';
+        if (document.getElementById('lastName')) document.getElementById('lastName').value = '';
+        if (document.getElementById('email')) document.getElementById('email').value = '';
+        if (document.getElementById('address')) document.getElementById('address').value = '';
+    };
+}
     </script>
 </body>
 </html>
