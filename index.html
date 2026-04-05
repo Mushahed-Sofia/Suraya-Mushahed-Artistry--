@@ -40,8 +40,8 @@
         .fullscreen-bg {
             height: 100vh;
             width: 100%;
-            background: linear-gradient(rgba(194, 194, 138, 0.8), rgb(59, 57, 0)), 
-                        url('IMG_8806.jpg');
+            background: linear-gradient(rgba(214, 214, 204, 0.8), rgb(96, 93, 0)), 
+                        url('/IMG_8806.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -2449,8 +2449,8 @@
     <div class="fullscreen-bg">
         <div class="overlay-text">
             <h1>Welcome to Suraya </h1>
-            <p class="tagline">  weaving yourself into a  living voice of 500-years,  story of  visual poetry  structural elegance   and historical resilience celebrates us 🦢...... </p>
-            <p class="journey-text">Suraya is the search for home in dispraise — split between two lands, afford never finding home again. Suraya is the bridge; pieces of art to remind the dispersed to where we belong.</p>
+            <p class="tagline">  weaving yourself into a  living voice of 500-years,  story of  visual poetry  structural elegance   and historical resilience celebrates us 🦌 </p>
+            <p class="journey-text">not in the absence of Kabul-Stress, but in defiance of it</p>
             <a href="#products" class="btn">Explore Collection</a>
         </div>
         <div class="scroll-down" id="scroll-down">
@@ -2832,19 +2832,17 @@
                             </div>
                         </div>
                         
-                       <!-- PAYMENT NOTE -->
-<div style="background: #e8e8d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; border-left: 4px solid #757331;">
-    <i class="fas fa-info-circle" style="color: #757331; margin-right: 8px;"></i>
-    <strong style="color: #757331;">How to pay:</strong>
-    <span style="color: #5a5a3a;"> Congratulations on your order; upon your completion, we will send you a PayPal invoice to your email address. You can pay securely with credit card or PayPal account. Thank you for celebrating Afghan culture with your purchase from Suraya's Artistry! 🦢</span>
-</div>
-
-<div class="checkout-buttons">
-    <button type="submit" class="checkout-confirm-btn" id="complete-payment">
-        <i class="fas fa-lock"></i> Complete Payment
-    </button>
-    <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
-</div>
+                        <!-- PayPal Form (Hidden by default) -->
+                        <div class="credit-card-form" id="paypal-form">
+                            <div class="checkout-form-group">
+                                <p style="text-align: center; color: #8a8840; margin: 20px 0;">
+                                    You will be redirected to PayPal to complete your payment securely.
+                                </p>
+                                <div style="text-align: center; margin: 20px 0;">
+                                    <i class="fab fa-paypal" style="font-size: 3rem; color: #003087;"></i>
+                                </div>
+                            </div>
+                        </div>
                         
                         <!-- Apple Pay Form (Hidden by default) -->
                         <div class="credit-card-form" id="apple-form">
@@ -5324,60 +5322,6 @@
         
         // Initialize the app
         init();
-            // FIX: Complete Payment Button
-const paymentButton = document.getElementById('complete-payment');
-        
-/// FIX: Complete Payment Button
-const paymentButton = document.getElementById('complete-payment');
-if (paymentButton) {
-    paymentButton.onclick = function(e) {
-        e.preventDefault();
-        
-        // Get customer info from input fields
-        const firstName = document.getElementById('firstName') ? document.getElementById('firstName').value : '';
-        const lastName = document.getElementById('lastName') ? document.getElementById('lastName').value : '';
-        const email = document.getElementById('email') ? document.getElementById('email').value : '';
-        const address = document.getElementById('address') ? document.getElementById('address').value : '';
-        
-        // Check if fields are filled
-        if (!firstName || !email || !address) {
-            alert('Please fill in your first name, email, and address');
-            return;
-        }
-        
-        // Check if cart has items
-        if (cart.length === 0) {
-            alert('Your cart is empty');
-            return;
-        }
-        
-        // Calculate total
-        let subtotal = 0;
-        cart.forEach(item => {
-            subtotal += item.price * item.quantity;
-        });
-        const total = subtotal + 2.99;
-        
-        // Show order confirmation
-        alert(`✅ ORDER RECEIVED!\n\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nAddress: ${address}\n\nTotal: $${total.toFixed(2)}\n\n📧 We will send a PayPal invoice to ${email} within 24 hours.\n\nThank you for supporting Afghan artistry! 🦢`);
-        
-        // Clear cart
-        cart = [];
-        if (typeof updateCart === 'function') updateCart();
-        
-        // Close checkout form
-        const checkoutForm = document.getElementById('checkout-form');
-        if (checkoutForm) checkoutForm.style.display = 'none';
-        
-        // Clear form fields
-        if (document.getElementById('firstName')) document.getElementById('firstName').value = '';
-        if (document.getElementById('lastName')) document.getElementById('lastName').value = '';
-        if (document.getElementById('email')) document.getElementById('email').value = '';
-        if (document.getElementById('address')) document.getElementById('address').value = '';
-        if (document.getElementById('city')) document.getElementById('city').value = '';
-        if (document.getElementById('zip')) document.getElementById('zip').value = '';
-    };
-}
     </script>
 </body>
-</html>
+</html> 
