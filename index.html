@@ -1,103 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Add security-related meta tags -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self'">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- Add security-related meta tags -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self'">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<!-- Rest of your head content remains the same -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suraya's Artistry | Celebrate Our Resistance</title>
+
+<!-- Preconnect with crossorigin for external resources -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+<!-- Your existing stylesheets -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&family=Ballet&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
     
-    <!-- Rest of your head content remains the same -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> suraya artistry, celebrate us with a purchase, Sofia Mushahed</title>
+    :root {
+        --primary: #6b6828;
+        --primary-light: #7a7738;
+        --cream: #d4cdb6;
+    }
     
-    <!-- Preconnect with crossorigin for external resources -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    body {
+        font-family: 'Roboto', sans-serif;
+        color: #333;
+        overflow-x: hidden;
+        line-height: 1.6;
+        background: #f9f9f9;
+    }
     
-    <!-- Your existing stylesheets -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&family=Ballet&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+   .fullscreen-bg {
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(rgba(214, 214, 204, 0.8), rgb(96, 93, 0)), 
+                url('https://raw.githubusercontent.com/Mushahed-Sofia/Suraya-Mushahed-Artistry--/main/IMG_8806.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    padding: 20px;
+}
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Roboto', sans-serif;
-            color: #333;
-            overflow-x: hidden;
-            line-height: 1.6;
-            background: #f9f9f9;
-        }
-        
-        .fullscreen-bg {
-            height: 100vh;
-            width: 100%;
-            background: linear-gradient(rgba(214, 214, 204, 0.8), rgb(96, 93, 0)), 
-                        url('IMG_8806.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .overlay-text {
-            max-width: 800px;
-            z-index: 10;
-        }
-        
-        .overlay-text h1 {
-            font-family: 'Ballet', cursive;
-            font-size: 4.5rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            font-weight: 700;
-            line-height: 1.2;
-            color: #e4ddc6;
-        }
-        
-        .overlay-text p {
-            font-family: 'Ballet', cursive;
-            font-size: 1.5rem;
-            margin-bottom: 2.5rem;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-            color: #e4ddc6;
-        }
-        
-        .btn {
-            display: inline-block;
-            background-color: #e4ddc6;
-            color: #757331;
-            padding: 1.2rem 3rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-            border: 2px solid #e4ddc6;
-            font-size: 1.2rem;
-            margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            font-family: 'Ballet', cursive;
-        }
-        
-        .btn:hover {
-            background-color: transparent;
-            color: #e4ddc6;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    .overlay-text {
+        max-width: 800px;
+        z-index: 10;
+    }
+    
+    .overlay-text h1 {
+        font-family: 'Ballet', cursive;
+        font-size: 4.5rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        color: var(--cream);
+    }
+    
+    .overlay-text p {
+        font-family: 'Ballet', cursive;
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+        color: var(--cream);
+    }
+    
+    .btn {
+        display: inline-block;
+        background-color: var(--cream);
+        color: var(--primary);
+        padding: 1.2rem 3rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+        border: 2px solid var(--cream);
+        font-size: 1.2rem;
+        margin-top: 1rem;
+        cursor: pointer;
+        font-family: 'Ballet', cursive;
+    }
+    
+    .btn:hover {
+        background-color: transparent;
+        color: var(--cream);
+        transform: translateY(-3px);
+  0 6px 20px rgba(0, 0, 0, 0.3);
         }
         
         .scroll-down {
