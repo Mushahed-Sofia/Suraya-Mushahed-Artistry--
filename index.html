@@ -2874,22 +2874,14 @@
                                 <span id="checkout-total">$0.00</span>
                             </div>
                         </div>
+                       
 <div class="checkout-buttons">
-    <!-- Real PayPal Button -->
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="flex:1;">
-        <input type="hidden" name="cmd" value="_xclick">
-        <input type="hidden" name="business" value="smushahe@uci.edu">
-        <input type="hidden" name="item_name" value="Suraya's Artistry Order">
-        <input type="hidden" name="currency_code" value="USD">
-        <input type="hidden" name="amount" id="paypal-amount" value="0.00">
-        <input type="hidden" name="return" value="https://suraya-mushahed-artistry.onrender.com/thank-you.html">
-        <input type="hidden" name="cancel_return" value="https://suraya-mushahed-artistry.onrender.com/cancel.html">
-        <button type="submit" class="checkout-confirm-btn" style="width:100%;">
-            <i class="fab fa-paypal"></i> Pay with PayPal
-        </button>
-    </form>
+    <!-- Simple PayPal Button -->
+    <a href="https://www.paypal.com/paypalme/smushahe" target="_blank" class="checkout-confirm-btn" style="display: inline-block; text-align: center; text-decoration: none; background: #0070ba; color: white; padding: 15px 25px; border-radius: 8px; font-weight: bold; flex:1;">
+        <i class="fab fa-paypal"></i> Pay with PayPal
+    </a>
     <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
-</div> 
+</div>
                        
            
             <div class="tab-content" id="admin-tab">
@@ -3000,56 +2992,12 @@
     </footer>
 
   <script>
-    // Store for stickers and cart
+    // STICKERS DATA
     let stickers = [
-        {
-            id: 1,
-            title: "Traditional Mosque",
-            price: 4.99,
-            icon: "fas fa-mosque",
-            description: "Beautiful Afghan mosque architecture with intricate details and patterns.",
-            color: "#757331",
-            image: "https://images.unsplash.com/photo-1601597119242-8d2bb8db15ad?w=800",
-            caption: "Traditional Afghan Mosque Art",
-            limitedEdition: false,
-            customImage: null
-        },
-        {
-            id: 2,
-            title: "Cultural Symbol",
-            price: 3.99,
-            icon: "fas fa-star-and-crescent",
-            description: "Symbolic representation of Afghan culture with traditional patterns.",
-            color: "#757331",
-            image: "https://images.unsplash.com/photo-1585837814269-6630d4c7bfc2?w=800",
-            caption: "Cultural Symbols of Afghanistan",
-            limitedEdition: true,
-            customImage: null
-        },
-        {
-            id: 3,
-            title: "Peace & Heritage",
-            price: 5.99,
-            icon: "fas fa-dove",
-            description: "Dove of peace combined with traditional Afghan patterns.",
-            color: "#757331",
-            image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=800",
-            caption: "Peace and Heritage Design",
-            limitedEdition: false,
-            customImage: null
-        },
-        {
-            id: 4,
-            title: "Afghan Star",
-            price: 4.49,
-            icon: "fas fa-star",
-            description: "Traditional Afghan star pattern with vibrant colors.",
-            color: "#757331",
-            image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800",
-            caption: "Traditional Star Pattern",
-            limitedEdition: true,
-            customImage: null
-        }
+        { id: 1, title: "Traditional Mosque", price: 4.99, description: "Beautiful Afghan mosque architecture.", image: "https://images.unsplash.com/photo-1601597119242-8d2bb8db15ad?w=400", limitedEdition: false },
+        { id: 2, title: "Cultural Symbol", price: 3.99, description: "Symbol of Afghan resilience.", image: "https://images.unsplash.com/photo-1585837814269-6630d4c7bfc2?w=400", limitedEdition: true },
+        { id: 3, title: "Peace & Heritage", price: 5.99, description: "Dove of peace with traditional patterns.", image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=400", limitedEdition: false },
+        { id: 4, title: "Afghan Star", price: 4.49, description: "Traditional Afghan star pattern.", image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=400", limitedEdition: true }
     ];
 
     let cart = [];
@@ -3058,26 +3006,11 @@
     let isUnlocked = false;
     const ACCESS_CODE = "Mushahed@490";
     
-    // User Authentication
+    // User data
     let users = JSON.parse(localStorage.getItem('stickerShopUsers')) || [
-        {
-            id: 1,
-            name: "Demo User",
-            email: "user@example.com",
-            password: "password123",
-            profile: {
-                avatar: "https://via.placeholder.com/150",
-                phone: "",
-                bio: "",
-                address: "",
-                theme: "default"
-            },
-            orders: []
-        }
+        { id: 1, name: "Demo User", email: "user@example.com", password: "password123", orders: [] }
     ];
-
     let orders = JSON.parse(localStorage.getItem('stickerShopOrders')) || [];
-    let subscriptions = JSON.parse(localStorage.getItem('stickerShopSubscriptions')) || [];
     
     // DOM Elements
     const stickerContainer = document.getElementById('sticker-container');
@@ -3086,18 +3019,23 @@
     const checkoutBtn = document.getElementById('checkout-btn');
     const checkoutForm = document.getElementById('checkout-form');
     const checkoutCancelBtn = document.getElementById('checkout-cancel-btn');
-    const checkoutDetailsForm = document.getElementById('checkout-details-form');
-    const checkoutItems = document.getElementById('checkout-items');
-    const checkoutShipping = document.getElementById('checkout-shipping');
-    const checkoutTotal = document.getElementById('checkout-total');
-    const addStickerForm = document.getElementById('add-sticker-form');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
     const adminPanel = document.getElementById('admin-panel');
     const adminTabBtn = document.getElementById('admin-tab-btn');
     const scrollDownBtn = document.getElementById('scroll-down');
     
-    // Access Control Elements
+    // Auth Elements
+    const authBtn = document.getElementById('auth-btn');
+    const userProfile = document.getElementById('user-profile');
+    const userName = document.getElementById('user-name');
+    const authModal = document.getElementById('auth-modal');
+    const userMenu = document.getElementById('user-menu');
+    const loginSubmit = document.getElementById('login-submit');
+    const signupSubmit = document.getElementById('signup-submit');
+    const logoutBtn = document.getElementById('logout-btn');
+    const profileBtn = document.getElementById('profile-btn');
+    const trackOrderBtn = document.getElementById('track-order-btn');
+    
+    // Access Control
     const accessToggle = document.getElementById('access-toggle');
     const accessPanel = document.getElementById('access-panel');
     const accessPassword = document.getElementById('access-password');
@@ -3106,188 +3044,103 @@
     const devPanel = document.getElementById('dev-panel');
     const devLogoutBtn = document.getElementById('dev-logout');
     
-    // User Authentication Elements
-    const authBtn = document.getElementById('auth-btn');
-    const userProfile = document.getElementById('user-profile');
-    const userName = document.getElementById('user-name');
-    const authModal = document.getElementById('auth-modal');
-    const userMenu = document.getElementById('user-menu');
-    const authTabs = document.querySelectorAll('.auth-tab');
-    const authForms = document.querySelectorAll('.auth-form');
-    const loginSubmit = document.getElementById('login-submit');
-    const signupSubmit = document.getElementById('signup-submit');
-    const logoutBtn = document.getElementById('logout-btn');
-    const profileBtn = document.getElementById('profile-btn');
-    const trackOrderBtn = document.getElementById('track-order-btn');
-    const orderHistoryBtn = document.getElementById('order-history-btn');
-    
     // Profile Elements
     const profileSection = document.getElementById('profile-section');
-    const profileAvatar = document.getElementById('profile-avatar');
-    const avatarUpload = document.getElementById('avatar-upload');
-    const avatarUploadBtn = document.getElementById('avatar-upload-btn');
     const profileName = document.getElementById('profile-name');
     const profileEmail = document.getElementById('profile-email');
     const profilePhone = document.getElementById('profile-phone');
-    const profileBio = document.getElementById('profile-bio');
     const profileAddress = document.getElementById('profile-address');
-    const profileTheme = document.getElementById('profile-theme');
     const saveProfile = document.getElementById('save-profile');
     const cancelProfile = document.getElementById('cancel-profile');
-    const profileSuccess = document.getElementById('profile-success');
     
     // Track Order Elements
     const trackOrderSection = document.getElementById('track-order-section');
     const orderIdInput = document.getElementById('order-id-input');
     const trackOrderSubmit = document.getElementById('track-order-btn');
-    const orderStatus = document.getElementById('order-status');
-    const orderHistorySection = document.getElementById('order-history-section');
-    const ordersList = document.getElementById('orders-list');
     
-    // RENDER STICKERS
+    // ========== RENDER STICKERS ==========
     function renderStickers() {
         if (!stickerContainer) return;
-        stickerContainer.innerHTML = '';
-        
-        stickers.forEach(sticker => {
-            const stickerCard = document.createElement('div');
-            stickerCard.className = 'sticker-card';
-            
-            const badge = sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : '';
-            const imageContent = sticker.customImage 
-                ? `<img src="${sticker.customImage}" alt="${sticker.title}">`
-                : `<img src="${sticker.image}" alt="${sticker.title}">`;
-            
-            const editButton = isUnlocked ? `<button class="edit-sticker-btn" data-id="${sticker.id}"><i class="fas fa-edit"></i></button>` : '';
-            const deleteButton = isUnlocked ? `<button class="delete-sticker-btn" data-id="${sticker.id}"><i class="fas fa-trash"></i></button>` : '';
-            
-            stickerCard.innerHTML = `
-                ${badge}
-                ${editButton}
-                ${deleteButton}
-                <div class="sticker-img">
-                    ${imageContent}
-                </div>
+        stickerContainer.innerHTML = stickers.map(sticker => `
+            <div class="sticker-card">
+                ${sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : ''}
+                <div class="sticker-img"><img src="${sticker.image}" alt="${sticker.title}"></div>
                 <div class="sticker-info">
                     <h3 class="sticker-title">${sticker.title}</h3>
                     <p class="sticker-desc">${sticker.description}</p>
-                    <div class="sticker-price">$${sticker.price.toFixed(2)}</div>
+                    <div class="sticker-price">$${sticker.price}</div>
                     <div class="purchase-options">
                         <div class="quantity-selector">
                             <button class="qty-btn minus">-</button>
                             <input type="text" class="qty-input" value="1">
                             <button class="qty-btn plus">+</button>
                         </div>
-                        <button class="add-cart-btn" data-id="${sticker.id}">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
+                        <button class="add-cart-btn" data-id="${sticker.id}"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                     </div>
                 </div>
-            `;
-            stickerContainer.appendChild(stickerCard);
-        });
+            </div>
+        `).join('');
         
+        // Quantity buttons
         document.querySelectorAll('.qty-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const input = this.parentElement.querySelector('.qty-input');
-                let value = parseInt(input.value);
-                if (this.classList.contains('plus')) value++;
-                else if (this.classList.contains('minus') && value > 1) value--;
-                input.value = value;
+                let val = parseInt(input.value);
+                if (this.classList.contains('plus')) val++;
+                else if (val > 1) val--;
+                input.value = val;
             });
         });
         
+        // Add to cart buttons
         document.querySelectorAll('.add-cart-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = parseInt(this.dataset.id);
-                const quantity = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
-                addToCart(id, quantity);
-                const sticker = stickers.find(s => s.id === id);
-                alert(`Added ${quantity} "${sticker.title}" to your cart!`);
-                this.closest('.purchase-options').querySelector('.qty-input').value = "1";
+                const qty = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
+                addToCart(id, qty);
             });
         });
     }
     
-    // CART FUNCTIONS
+    // ========== CART FUNCTIONS ==========
     function addToCart(id, quantity) {
         const sticker = stickers.find(s => s.id === id);
-        const existing = cart.find(item => item.id === id);
-        if (existing) {
-            existing.quantity += quantity;
-        } else {
-            cart.push({ ...sticker, quantity: quantity });
-        }
+        const existing = cart.find(i => i.id === id);
+        if (existing) existing.quantity += quantity;
+        else cart.push({ ...sticker, quantity });
         updateCart();
-        updatePayPalAmount();
+        alert(`Added ${quantity} "${sticker.title}" to cart`);
     }
     
     function removeFromCart(id) {
-        cart = cart.filter(item => item.id !== id);
+        cart = cart.filter(i => i.id !== id);
         updateCart();
-        updatePayPalAmount();
     }
     
     function updateCart() {
-        if (!cartItems || !cartTotal || !checkoutBtn) return;
-        
-        cartItems.innerHTML = '';
-        
+        if (!cartItems || !cartTotal) return;
         if (cart.length === 0) {
             cartItems.innerHTML = '<div class="cart-item">Your cart is empty</div>';
-            checkoutBtn.disabled = true;
-            checkoutBtn.style.opacity = '0.6';
-            cartTotal.textContent = '$0.00';
+            cartTotal.innerText = '$0.00';
+            if (checkoutBtn) checkoutBtn.disabled = true;
             return;
         }
-        
         let subtotal = 0;
-        cart.forEach(item => {
+        cartItems.innerHTML = cart.map(item => {
             const itemTotal = item.price * item.quantity;
             subtotal += itemTotal;
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
-            cartItem.innerHTML = `
-                <span>${item.title} (${item.quantity})</span>
-                <div class="cart-item-actions">
-                    <span>$${itemTotal.toFixed(2)}</span>
-                    <button class="remove-item" data-id="${item.id}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
-            cartItems.appendChild(cartItem);
-        });
-        
+            return `<div class="cart-item"><span>${item.title} x${item.quantity}</span><div><span>$${itemTotal.toFixed(2)}</span> <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button></div></div>`;
+        }).join('');
         const total = subtotal + shippingCost;
-        cartTotal.textContent = `$${total.toFixed(2)}`;
-        checkoutBtn.disabled = false;
-        checkoutBtn.style.opacity = '1';
+        cartTotal.innerText = `$${total.toFixed(2)}`;
+        if (checkoutBtn) checkoutBtn.disabled = false;
         
         document.querySelectorAll('.remove-item').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = parseInt(this.dataset.id);
-                removeFromCart(id);
-            });
+            btn.addEventListener('click', () => removeFromCart(parseInt(btn.dataset.id)));
         });
     }
     
-    // UPDATE PAYPAL AMOUNT
-    function updatePayPalAmount() {
-        const paypalAmount = document.getElementById('paypal-amount');
-        if (paypalAmount && cart.length > 0) {
-            let subtotal = 0;
-            cart.forEach(item => {
-                subtotal += item.price * item.quantity;
-            });
-            const total = (subtotal + shippingCost).toFixed(2);
-            paypalAmount.value = total;
-        } else if (paypalAmount) {
-            paypalAmount.value = '0.00';
-        }
-    }
-    
-    // CHECKOUT FUNCTIONS
+    // ========== CHECKOUT ==========
     function showCheckoutForm() {
         if (checkoutForm) checkoutForm.style.display = 'block';
         updateCheckoutSummary();
@@ -3298,46 +3151,35 @@
     }
     
     function updateCheckoutSummary() {
-        if (!checkoutItems || !checkoutShipping || !checkoutTotal) return;
+        const checkoutItems = document.getElementById('checkout-items');
+        const checkoutShipping = document.getElementById('checkout-shipping');
+        const checkoutTotal = document.getElementById('checkout-total');
+        if (!checkoutItems) return;
         
-        checkoutItems.innerHTML = '';
         let subtotal = 0;
-        
-        cart.forEach(item => {
+        checkoutItems.innerHTML = cart.map(item => {
             const itemTotal = item.price * item.quantity;
             subtotal += itemTotal;
-            const checkoutItem = document.createElement('div');
-            checkoutItem.className = 'checkout-summary-item';
-            checkoutItem.innerHTML = `<span>${item.title} (${item.quantity})</span><span>$${itemTotal.toFixed(2)}</span>`;
-            checkoutItems.appendChild(checkoutItem);
-        });
-        
+            return `<div class="checkout-summary-item"><span>${item.title} (${item.quantity})</span><span>$${itemTotal.toFixed(2)}</span></div>`;
+        }).join('');
         const total = subtotal + shippingCost;
-        checkoutShipping.textContent = `$${shippingCost.toFixed(2)}`;
-        checkoutTotal.textContent = `$${total.toFixed(2)}`;
-        updatePayPalAmount();
+        if (checkoutShipping) checkoutShipping.innerText = `$${shippingCost.toFixed(2)}`;
+        if (checkoutTotal) checkoutTotal.innerText = `$${total.toFixed(2)}`;
+        
+        // Update PayPal amount
+        const paypalAmount = document.getElementById('paypal-amount');
+        if (paypalAmount) paypalAmount.value = total.toFixed(2);
     }
     
-    // USER AUTHENTICATION
+    // ========== USER AUTH ==========
     function checkLoginStatus() {
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            updateUIForLoggedInUser();
+        const saved = localStorage.getItem('currentUser');
+        if (saved) {
+            currentUser = JSON.parse(saved);
+            if (authBtn) authBtn.style.display = 'none';
+            if (userProfile) userProfile.classList.add('active');
+            if (userName) userName.textContent = currentUser.name;
         }
-    }
-    
-    function updateUIForLoggedInUser() {
-        if (authBtn) authBtn.style.display = 'none';
-        if (userProfile) userProfile.classList.add('active');
-        if (userName && currentUser) userName.textContent = currentUser.name;
-        if (authModal) authModal.classList.remove('active');
-    }
-    
-    function updateUIForLoggedOutUser() {
-        if (authBtn) authBtn.style.display = 'flex';
-        if (userProfile) userProfile.classList.remove('active');
-        if (userMenu) userMenu.classList.remove('active');
     }
     
     function loginUser(email, password) {
@@ -3345,33 +3187,31 @@
         if (user) {
             currentUser = { ...user };
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            updateUIForLoggedInUser();
+            if (authBtn) authBtn.style.display = 'none';
+            if (userProfile) userProfile.classList.add('active');
+            if (userName) userName.textContent = currentUser.name;
+            if (authModal) authModal.classList.remove('active');
             alert(`Welcome back, ${user.name}!`);
             return true;
-        } else {
-            alert('Invalid email or password!');
-            return false;
         }
+        alert('Invalid email or password!');
+        return false;
     }
     
     function signupUser(name, email, password) {
         if (users.find(u => u.email === email)) {
-            alert('User with this email already exists!');
+            alert('User already exists!');
             return false;
         }
-        
-        const newUser = {
-            id: users.length + 1,
-            name, email, password,
-            profile: { avatar: "https://via.placeholder.com/150", phone: "", bio: "", address: "", theme: "default" },
-            orders: []
-        };
-        
+        const newUser = { id: users.length + 1, name, email, password, orders: [] };
         users.push(newUser);
         localStorage.setItem('stickerShopUsers', JSON.stringify(users));
         currentUser = { ...newUser };
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        updateUIForLoggedInUser();
+        if (authBtn) authBtn.style.display = 'none';
+        if (userProfile) userProfile.classList.add('active');
+        if (userName) userName.textContent = name;
+        if (authModal) authModal.classList.remove('active');
         alert(`Welcome to Suraya's Artistry, ${name}!`);
         return true;
     }
@@ -3379,191 +3219,48 @@
     function logoutUser() {
         currentUser = null;
         localStorage.removeItem('currentUser');
-        updateUIForLoggedOutUser();
-        alert('You have been logged out.');
+        if (authBtn) authBtn.style.display = 'flex';
+        if (userProfile) userProfile.classList.remove('active');
+        if (userMenu) userMenu.classList.remove('active');
+        alert('Logged out');
     }
     
-    // ACCESS CONTROL
+    // ========== ACCESS CONTROL ==========
     function unlockAccess() {
-        const password = accessPassword.value;
-        if (password === ACCESS_CODE) {
+        if (accessPassword.value === ACCESS_CODE) {
             isUnlocked = true;
-            accessStatus.textContent = "Access granted!";
-            accessPanel.classList.remove('active');
-            devPanel.classList.add('active');
-            accessToggle.innerHTML = '<i class="fas fa-unlock"></i>';
-            adminTabBtn.disabled = false;
-            adminTabBtn.style.opacity = "1";
-            renderStickers();
+            if (accessStatus) accessStatus.textContent = "Access granted!";
+            if (accessPanel) accessPanel.classList.remove('active');
+            if (devPanel) devPanel.classList.add('active');
+            if (accessToggle) accessToggle.innerHTML = '<i class="fas fa-unlock"></i>';
+            if (adminTabBtn) {
+                adminTabBtn.disabled = false;
+                adminTabBtn.style.opacity = "1";
+            }
+            alert('Admin access granted!');
         } else {
-            accessStatus.textContent = "Invalid access code!";
+            if (accessStatus) accessStatus.textContent = "Wrong code!";
         }
     }
     
     function lockAccess() {
         isUnlocked = false;
-        devPanel.classList.remove('active');
-        accessToggle.innerHTML = '<i class="fas fa-lock"></i>';
-        adminTabBtn.disabled = true;
-        adminTabBtn.style.opacity = "0.5";
-        renderStickers();
+        if (devPanel) devPanel.classList.remove('active');
+        if (accessToggle) accessToggle.innerHTML = '<i class="fas fa-lock"></i>';
+        if (adminTabBtn) {
+            adminTabBtn.disabled = true;
+            adminTabBtn.style.opacity = "0.5";
+        }
+        alert('Admin access locked');
     }
     
-    // SETUP EVENT LISTENERS
-    function setupEventListeners() {
-        if (scrollDownBtn) {
-            scrollDownBtn.addEventListener('click', () => {
-                document.querySelector('#products').scrollIntoView({ behavior: 'smooth' });
-            });
-        }
-        
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                if (!currentUser) {
-                    alert('Please login first');
-                    authModal.classList.add('active');
-                    return;
-                }
-                if (cart.length === 0) {
-                    alert('Your cart is empty');
-                } else {
-                    showCheckoutForm();
-                }
-            });
-        }
-        
-        if (checkoutCancelBtn) {
-            checkoutCancelBtn.addEventListener('click', hideCheckoutForm);
-        }
-        
-        if (addStickerForm) {
-            addStickerForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!isUnlocked) {
-                    alert("Please unlock access first!");
-                    return;
-                }
-                const title = document.getElementById('sticker-title').value;
-                const price = parseFloat(document.getElementById('sticker-price').value);
-                const icon = document.getElementById('sticker-icon').value;
-                const description = document.getElementById('sticker-desc').value;
-                const color = document.getElementById('sticker-color').value;
-                const image = document.getElementById('sticker-image').value;
-                const limitedEdition = document.getElementById('sticker-limited').value === 'yes';
-                const id = stickers.length + 1;
-                
-                stickers.push({ id, title, price, icon, description, color, image: image || null, caption: title, limitedEdition, customImage: null });
-                renderStickers();
-                addStickerForm.reset();
-                alert(`"${title}" has been added!`);
-            });
-        }
-        
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                tabContents.forEach(content => content.classList.remove('active'));
-                document.getElementById(`${tab}-tab`).classList.add('active');
-                if (tab === 'admin' && isUnlocked && adminPanel) adminPanel.classList.add('active');
-                else if (adminPanel) adminPanel.classList.remove('active');
-            });
-        });
-        
-        // Auth Listeners
-        if (authBtn) {
-            authBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (authModal) authModal.classList.toggle('active');
-                if (userMenu) userMenu.classList.remove('active');
-            });
-        }
-        
-        if (userProfile) {
-            userProfile.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (userMenu) userMenu.classList.toggle('active');
-                if (authModal) authModal.classList.remove('active');
-            });
-        }
-        
-        authTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.dataset.tab;
-                authTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                authForms.forEach(form => form.classList.remove('active'));
-                const targetForm = document.getElementById(`${tabName}-form`);
-                if (targetForm) targetForm.classList.add('active');
-            });
-        });
-        
-        if (loginSubmit) {
-            loginSubmit.addEventListener('click', () => {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                if (email && password) loginUser(email, password);
-                else alert('Please fill in all fields!');
-            });
-        }
-        
-        if (signupSubmit) {
-            signupSubmit.addEventListener('click', () => {
-                const name = document.getElementById('signup-name').value;
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-                const confirm = document.getElementById('signup-confirm').value;
-                if (name && email && password && confirm) {
-                    if (password !== confirm) alert('Passwords do not match!');
-                    else if (password.length < 6) alert('Password must be at least 6 characters!');
-                    else signupUser(name, email, password);
-                } else alert('Please fill in all fields!');
-            });
-        }
-        
-        if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
-        if (profileBtn) profileBtn.addEventListener('click', showProfileSection);
-        if (trackOrderBtn) trackOrderBtn.addEventListener('click', showTrackOrderSection);
-        if (orderHistoryBtn) orderHistoryBtn.addEventListener('click', showOrderHistory);
-        
-        // Access Control
-        if (accessToggle) {
-            accessToggle.addEventListener('click', () => {
-                if (accessPanel) accessPanel.classList.toggle('active');
-            });
-        }
-        if (accessSubmit) accessSubmit.addEventListener('click', unlockAccess);
-        if (devLogoutBtn) devLogoutBtn.addEventListener('click', lockAccess);
-        
-        // Close modals
-        document.addEventListener('click', () => {
-            if (authModal) authModal.classList.remove('active');
-            if (userMenu) userMenu.classList.remove('active');
-            if (accessPanel) accessPanel.classList.remove('active');
-        });
-        
-        if (authModal) authModal.addEventListener('click', (e) => e.stopPropagation());
-        if (userMenu) userMenu.addEventListener('click', (e) => e.stopPropagation());
-        if (accessPanel) accessPanel.addEventListener('click', (e) => e.stopPropagation());
-        
-        adminTabBtn.disabled = true;
-        adminTabBtn.style.opacity = "0.5";
-    }
-    
-    // PROFILE FUNCTIONS
+    // ========== PROFILE ==========
     function showProfileSection() {
-        if (!currentUser) {
-            alert('Please log in to view your profile!');
-            return;
-        }
+        if (!currentUser) { alert('Please login first'); return; }
         if (profileName) profileName.value = currentUser.name || '';
         if (profileEmail) profileEmail.value = currentUser.email || '';
         if (profilePhone) profilePhone.value = currentUser.profile?.phone || '';
-        if (profileBio) profileBio.value = currentUser.profile?.bio || '';
         if (profileAddress) profileAddress.value = currentUser.profile?.address || '';
-        if (profileTheme) profileTheme.value = currentUser.profile?.theme || 'default';
-        if (profileAvatar) profileAvatar.src = currentUser.profile?.avatar || 'https://via.placeholder.com/150';
         if (profileSection) profileSection.classList.add('active');
         if (userMenu) userMenu.classList.remove('active');
     }
@@ -3572,33 +3269,25 @@
         if (!currentUser) return;
         currentUser.name = profileName.value;
         currentUser.email = profileEmail.value;
-        currentUser.profile = {
-            ...currentUser.profile,
-            phone: profilePhone.value,
-            bio: profileBio.value,
-            address: profileAddress.value,
-            theme: profileTheme.value
-        };
-        const userIndex = users.findIndex(u => u.id === currentUser.id);
-        if (userIndex !== -1) {
-            users[userIndex] = currentUser;
-            localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        }
+        currentUser.profile = { phone: profilePhone.value, address: profileAddress.value };
+        const index = users.findIndex(u => u.id === currentUser.id);
+        if (index !== -1) users[index] = currentUser;
+        localStorage.setItem('stickerShopUsers', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
         if (userName) userName.textContent = currentUser.name;
-        if (profileSuccess) profileSuccess.style.display = 'block';
-        setTimeout(() => {
-            if (profileSuccess) profileSuccess.style.display = 'none';
-        }, 3000);
+        alert('Profile saved!');
+        if (profileSection) profileSection.classList.remove('active');
     }
     
-    // TRACK ORDER FUNCTIONS
-    function trackOrder(orderId) {
+    // ========== TRACK ORDER ==========
+    function trackOrder() {
+        const orderId = orderIdInput ? orderIdInput.value.trim() : '';
+        if (!orderId) { alert('Enter order ID'); return; }
         const order = orders.find(o => o.id === orderId);
         if (order) {
-            alert(`Order Status: ${order.status}\nTotal: ${order.total}\nShipping to: ${order.shippingAddress}`);
+            alert(`Order ${order.id}\nStatus: ${order.status}\nTotal: ${order.total}`);
         } else {
-            alert('Order not found.');
+            alert('Order not found');
         }
     }
     
@@ -3607,54 +3296,96 @@
         if (userMenu) userMenu.classList.remove('active');
     }
     
-    function loadOrderHistory() {
-        if (!currentUser || !ordersList) return;
-        const userOrders = orders.filter(order => currentUser.orders.includes(order.id));
-        ordersList.innerHTML = '';
-        if (userOrders.length === 0) {
-            ordersList.innerHTML = '<div class="no-orders">No orders yet.</div>';
-            return;
+    // ========== EVENT LISTENERS ==========
+    function setupEventListeners() {
+        // Scroll
+        if (scrollDownBtn) {
+            scrollDownBtn.addEventListener('click', () => {
+                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+            });
         }
-        userOrders.forEach(order => {
-            const orderCard = document.createElement('div');
-            orderCard.className = 'order-card';
-            orderCard.innerHTML = `
-                <div><strong>Order ID:</strong> ${order.id}</div>
-                <div><strong>Status:</strong> ${order.status}</div>
-                <div><strong>Total:</strong> ${order.total}</div>
-            `;
-            ordersList.appendChild(orderCard);
+        
+        // Checkout
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => {
+                if (!currentUser) { alert('Please login first'); authModal?.classList.add('active'); return; }
+                if (cart.length === 0) { alert('Cart is empty'); return; }
+                showCheckoutForm();
+            });
+        }
+        if (checkoutCancelBtn) checkoutCancelBtn.addEventListener('click', hideCheckoutForm);
+        
+        // Auth
+        if (authBtn) {
+            authBtn.addEventListener('click', (e) => { e.stopPropagation(); authModal?.classList.toggle('active'); });
+        }
+        if (userProfile) {
+            userProfile.addEventListener('click', (e) => { e.stopPropagation(); userMenu?.classList.toggle('active'); });
+        }
+        if (loginSubmit) {
+            loginSubmit.addEventListener('click', () => {
+                const email = document.getElementById('login-email')?.value;
+                const pwd = document.getElementById('login-password')?.value;
+                if (email && pwd) loginUser(email, pwd);
+                else alert('Enter email and password');
+            });
+        }
+        if (signupSubmit) {
+            signupSubmit.addEventListener('click', () => {
+                const name = document.getElementById('signup-name')?.value;
+                const email = document.getElementById('signup-email')?.value;
+                const pwd = document.getElementById('signup-password')?.value;
+                const confirm = document.getElementById('signup-confirm')?.value;
+                if (!name || !email || !pwd) alert('Fill all fields');
+                else if (pwd !== confirm) alert('Passwords do not match');
+                else if (pwd.length < 6) alert('Password must be 6+ characters');
+                else signupUser(name, email, pwd);
+            });
+        }
+        if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+        if (profileBtn) profileBtn.addEventListener('click', showProfileSection);
+        if (trackOrderBtn) trackOrderBtn.addEventListener('click', showTrackOrderSection);
+        if (trackOrderSubmit) trackOrderSubmit.addEventListener('click', trackOrder);
+        
+        // Profile save/cancel
+        if (saveProfile) saveProfile.addEventListener('click', saveUserProfile);
+        if (cancelProfile) cancelProfile.addEventListener('click', () => profileSection?.classList.remove('active'));
+        
+        // Access control
+        if (accessToggle) accessToggle.addEventListener('click', () => accessPanel?.classList.toggle('active'));
+        if (accessSubmit) accessSubmit.addEventListener('click', unlockAccess);
+        if (devLogoutBtn) devLogoutBtn.addEventListener('click', lockAccess);
+        
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`${tab}-tab`)?.classList.add('active');
+                if (tab === 'admin' && isUnlocked) adminPanel?.classList.add('active');
+                else adminPanel?.classList.remove('active');
+            });
         });
-    }
-    
-    function showOrderHistory() {
-        if (!currentUser) {
-            alert('Please log in to view your order history!');
-            return;
+        
+        // Close modals
+        document.addEventListener('click', (e) => {
+            if (!authModal?.contains(e.target) && !authBtn?.contains(e.target)) authModal?.classList.remove('active');
+            if (!userMenu?.contains(e.target) && !userProfile?.contains(e.target)) userMenu?.classList.remove('active');
+            if (!accessPanel?.contains(e.target) && !accessToggle?.contains(e.target)) accessPanel?.classList.remove('active');
+        });
+        
+        if (adminTabBtn) {
+            adminTabBtn.disabled = true;
+            adminTabBtn.style.opacity = "0.5";
         }
-        loadOrderHistory();
-        if (orderHistorySection) orderHistorySection.classList.add('active');
-        if (userMenu) userMenu.classList.remove('active');
     }
     
-    // SUBSCRIPTION FUNCTIONS
-    function handleSubscription(plan) {
-        if (!currentUser) {
-            alert('Please log in to subscribe!');
-            return;
-        }
-        alert(`Thank you for subscribing to the ${plan} plan! You will be contacted for payment.`);
-    }
-    
-    // Initialize
-    function init() {
-        renderStickers();
-        updateCart();
-        setupEventListeners();
-        checkLoginStatus();
-        loadOrderHistory();
-        console.log("Suraya's Artistry initialized!");
-    }
-    
-    init();
+    // ========== INIT ==========
+    renderStickers();
+    updateCart();
+    setupEventListeners();
+    checkLoginStatus();
+    console.log("Suraya's Artistry Ready!");
 </script>
