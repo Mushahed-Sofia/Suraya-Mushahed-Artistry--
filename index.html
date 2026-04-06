@@ -2875,16 +2875,24 @@
                             </div>
                         </div>
                         
-                        <div class="checkout-buttons">
-                            <button type="submit" class="checkout-confirm-btn" id="complete-payment">
-                                <i class="fas fa-lock"></i> Complete Payment
-                            </button>
-                            <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
+<div class="checkout-buttons">
+    <!-- Real PayPal Button -->
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="flex:1;">
+        <input type="hidden" name="cmd" value="_xclick">
+        <input type="hidden" name="business" value="smushahe@uci.edu">
+        <input type="hidden" name="item_name" value="Suraya's Artistry Order">
+        <input type="hidden" name="currency_code" value="USD">
+        <input type="hidden" name="amount" id="paypal-amount" value="0.00">
+        <input type="hidden" name="return" value="https://suraya-mushahed-artistry.onrender.com/thank-you.html">
+        <input type="hidden" name="cancel_return" value="https://suraya-mushahed-artistry.onrender.com/cancel.html">
+        <button type="submit" class="checkout-confirm-btn" style="width:100%;">
+            <i class="fab fa-paypal"></i> Pay with PayPal
+        </button>
+    </form>
+    <button type="button" class="checkout-cancel-btn" id="checkout-cancel-btn">Cancel</button>
+</div>
+
+           
             <div class="tab-content" id="admin-tab">
                 <div class="admin-panel" id="admin-panel">
                     <h2 class="admin-title">Add New Sticker</h2>
@@ -4205,7 +4213,27 @@
         adminTabBtn.style.opacity = "0.5";
         adminTabBtn.style.cursor = "not-allowed";
     }
-    
+
+
+       // Update PayPal amount when cart changes
+function updatePayPalAmount() {
+    const paypalAmount = document.getElementById('paypal-amount');
+    if (paypalAmount && cart.length > 0) {
+        let subtotal = 0;
+        cart.forEach(item => {
+            subtotal += item.price * item.quantity;
+        });
+        const total = (subtotal + 2.99).toFixed(2);
+        paypalAmount.value = total;
+    }
+}
+
+// Call this whenever cart is updated
+const originalUpdateCart = updateCart;
+updateCart = function() {
+    originalUpdateCart();
+    updatePayPalAmount();
+};
     // ============================================
     // FIX: PAYMENT BUTTON (PayPal & Apple Pay)
     // ============================================
