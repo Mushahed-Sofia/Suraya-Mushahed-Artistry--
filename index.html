@@ -2984,76 +2984,831 @@
         </div>
     </footer>
 
-    <script>
-        // Store for stickers, gallery items, and cart
-        let stickers = [
-            {
-                id: 1,
-                title: "Traditional Mosque",
-                price: 4.99,
-                icon: "fas fa-mosque",
-                description: "Beautiful Afghan mosque architecture with intricate details and patterns.",
-                color: "#757331",
-                image: "https://images.unsplash.com/photo-1601597119242-8d2bb8db15ad?w=800",
-                caption: "Traditional Afghan Mosque Art",
-                limitedEdition: false,
-                customImage: null
-            },
-            {
-                id: 2,
-                title: "Cultural Symbol",
-                price: 3.99,
-                icon: "fas fa-star-and-crescent",
-                description: "Symbolic representation of Afghan culture with traditional patterns.",
-                color: "#757331",
-                image: "https://images.unsplash.com/photo-1585837814269-6630d4c7bfc2?w=800",
-                caption: "Cultural Symbols of Afghanistan",
-                limitedEdition: true,
-                customImage: null
-            },
-            {
-                id: 3,
-                title: "Peace & Heritage",
-                price: 5.99,
-                icon: "fas fa-dove",
-                description: "Dove of peace combined with traditional Afghan patterns.",
-                color: "#757331",
-                image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=800",
-                caption: "Peace and Heritage Design",
-                limitedEdition: false,
-                customImage: null
-            },
-            {
-                id: 4,
-                title: "Afghan Star",
-                price: 4.49,
-                icon: "fas fa-star",
-                description: "Traditional Afghan star pattern with vibrant colors.",
-                color: "#757331",
-                image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800",
-                caption: "Traditional Star Pattern",
-                limitedEdition: true,
-                customImage: null
-            }
-        ];
+  <script>
+    // Store for stickers, gallery items, and cart
+    let stickers = [
+        {
+            id: 1,
+            title: "Traditional Mosque",
+            price: 4.99,
+            icon: "fas fa-mosque",
+            description: "Beautiful Afghan mosque architecture with intricate details and patterns.",
+            color: "#757331",
+            image: "https://images.unsplash.com/photo-1601597119242-8d2bb8db15ad?w=800",
+            caption: "Traditional Afghan Mosque Art",
+            limitedEdition: false,
+            customImage: null
+        },
+        {
+            id: 2,
+            title: "Cultural Symbol",
+            price: 3.99,
+            icon: "fas fa-star-and-crescent",
+            description: "Symbolic representation of Afghan culture with traditional patterns.",
+            color: "#757331",
+            image: "https://images.unsplash.com/photo-1585837814269-6630d4c7bfc2?w=800",
+            caption: "Cultural Symbols of Afghanistan",
+            limitedEdition: true,
+            customImage: null
+        },
+        {
+            id: 3,
+            title: "Peace & Heritage",
+            price: 5.99,
+            icon: "fas fa-dove",
+            description: "Dove of peace combined with traditional Afghan patterns.",
+            color: "#757331",
+            image: "https://images.unsplash.com/photo-1518638150340-f706e86654de?w=800",
+            caption: "Peace and Heritage Design",
+            limitedEdition: false,
+            customImage: null
+        },
+        {
+            id: 4,
+            title: "Afghan Star",
+            price: 4.49,
+            icon: "fas fa-star",
+            description: "Traditional Afghan star pattern with vibrant colors.",
+            color: "#757331",
+            image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800",
+            caption: "Traditional Star Pattern",
+            limitedEdition: true,
+            customImage: null
+        }
+    ];
 
-        let cart = [];
-        const shippingCost = 2.99;
-        let currentGalleryIndex = 0;
-        let galleryInterval;
+    let cart = [];
+    const shippingCost = 2.99;
+    let currentGalleryIndex = 0;
+    let galleryInterval;
+    
+    // Access Control
+    let isUnlocked = false;
+    const ACCESS_CODE = "Mushahed@490";
+    
+    // User Authentication
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem('stickerShopUsers')) || [
+        {
+            id: 1,
+            name: "Demo User",
+            email: "user@example.com",
+            password: "password123",
+            profile: {
+                avatar: "https://via.placeholder.com/150",
+                phone: "",
+                bio: "",
+                address: "",
+                theme: "default"
+            },
+            orders: []
+        }
+    ];
+
+    // Orders storage
+    let orders = JSON.parse(localStorage.getItem('stickerShopOrders')) || [];
+    
+    // Subscriptions storage
+    let subscriptions = JSON.parse(localStorage.getItem('stickerShopSubscriptions')) || [];
+    
+    // Surprise images for gallery
+    let surpriseImages = [
+        {
+            image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?w=800",
+            caption: "Traditional Afghan Pattern"
+        },
+        {
+            image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800",
+            caption: "Cultural Heritage Design"
+        }
+    ];
+    
+    // Community gallery images
+    let communityImages = [
+        {
+            image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=800",
+            caption: "Amazing sticker designs!",
+            user: "ArtLover123",
+            avatar: "https://randomuser.me/api/portraits/women/1.jpg"
+        },
+        {
+            image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800",
+            caption: "Love these cultural stickers!",
+            user: "CultureExplorer",
+            avatar: "https://randomuser.me/api/portraits/men/2.jpg"
+        }
+    ];
+    
+    // DOM Elements
+    const stickerContainer = document.getElementById('sticker-container');
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const checkoutForm = document.getElementById('checkout-form');
+    const checkoutCancelBtn = document.getElementById('checkout-cancel-btn');
+    const checkoutDetailsForm = document.getElementById('checkout-details-form');
+    const checkoutItems = document.getElementById('checkout-items');
+    const checkoutShipping = document.getElementById('checkout-shipping');
+    const checkoutTotal = document.getElementById('checkout-total');
+    const addStickerForm = document.getElementById('add-sticker-form');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const galleryContainer = document.getElementById('gallery-container');
+    const galleryDots = document.getElementById('gallery-dots');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const adminPanel = document.getElementById('admin-panel');
+    const adminTabBtn = document.getElementById('admin-tab-btn');
+    const scrollDownBtn = document.getElementById('scroll-down');
+    
+    // Access Control Elements
+    const accessToggle = document.getElementById('access-toggle');
+    const accessPanel = document.getElementById('access-panel');
+    const accessPassword = document.getElementById('access-password');
+    const accessSubmit = document.getElementById('access-submit');
+    const accessStatus = document.getElementById('access-status');
+    
+    // Developer Panel Elements
+    const devPanel = document.getElementById('dev-panel');
+    const toggleUploadBtn = document.getElementById('toggle-upload');
+    const toggleStickerUploadBtn = document.getElementById('toggle-sticker-upload');
+    const clearGalleryBtn = document.getElementById('clear-gallery');
+    const addSampleImagesBtn = document.getElementById('add-sample-images');
+    const exportDataBtn = document.getElementById('export-data');
+    const devLogoutBtn = document.getElementById('dev-logout');
+    
+    // Image Upload Elements
+    const uploadSection = document.getElementById('upload-section');
+    const uploadArea = document.getElementById('upload-area');
+    const imageUpload = document.getElementById('image-upload');
+    const uploadPreview = document.getElementById('upload-preview');
+    const uploadActions = document.getElementById('upload-actions');
+    const confirmUpload = document.getElementById('confirm-upload');
+    const cancelUpload = document.getElementById('cancel-upload');
+    const imageCaption = document.getElementById('image-caption');
+    const uploadSuccess = document.getElementById('upload-success');
+    
+    // Sticker Image Upload Elements
+    const stickerUploadSection = document.getElementById('sticker-upload-section');
+    const stickerUploadArea = document.getElementById('sticker-upload-area');
+    const stickerImageUpload = document.getElementById('sticker-image-upload');
+    const stickerUploadPreview = document.getElementById('sticker-upload-preview');
+    const stickerUploadActions = document.getElementById('sticker-upload-actions');
+    const stickerConfirmUpload = document.getElementById('sticker-confirm-upload');
+    const stickerCancelUpload = document.getElementById('sticker-cancel-upload');
+    const stickerUploadSuccess = document.getElementById('sticker-upload-success');
+    
+    // User Authentication Elements
+    const authBtn = document.getElementById('auth-btn');
+    const authText = document.getElementById('auth-text');
+    const userProfile = document.getElementById('user-profile');
+    const userName = document.getElementById('user-name');
+    const authModal = document.getElementById('auth-modal');
+    const userMenu = document.getElementById('user-menu');
+    const authTabs = document.querySelectorAll('.auth-tab');
+    const authForms = document.querySelectorAll('.auth-form');
+    const loginSubmit = document.getElementById('login-submit');
+    const signupSubmit = document.getElementById('signup-submit');
+    const logoutBtn = document.getElementById('logout-btn');
+    const profileBtn = document.getElementById('profile-btn');
+    const trackOrderBtn = document.getElementById('track-order-btn');
+    const orderHistoryBtn = document.getElementById('order-history-btn');
+    
+    // Profile Elements
+    const profileSection = document.getElementById('profile-section');
+    const profileAvatar = document.getElementById('profile-avatar');
+    const avatarUpload = document.getElementById('avatar-upload');
+    const avatarUploadBtn = document.getElementById('avatar-upload-btn');
+    const profileName = document.getElementById('profile-name');
+    const profileEmail = document.getElementById('profile-email');
+    const profilePhone = document.getElementById('profile-phone');
+    const profileBio = document.getElementById('profile-bio');
+    const profileAddress = document.getElementById('profile-address');
+    const profileTheme = document.getElementById('profile-theme');
+    const saveProfile = document.getElementById('save-profile');
+    const cancelProfile = document.getElementById('cancel-profile');
+    const profileSuccess = document.getElementById('profile-success');
+    
+    // Track Order Elements
+    const trackOrderSection = document.getElementById('track-order-section');
+    const orderIdInput = document.getElementById('order-id-input');
+    const trackOrderSubmit = document.getElementById('track-order-btn');
+    const orderStatus = document.getElementById('order-status');
+    
+    // Order History Elements
+    const orderHistorySection = document.getElementById('order-history-section');
+    const ordersList = document.getElementById('orders-list');
+    
+    // Subscription Elements
+    const subscribeBtns = document.querySelectorAll('.subscribe-btn');
+    
+    // Community Gallery Elements
+    const communityGrid = document.getElementById('community-grid');
+    const uploadCommunityBtn = document.getElementById('upload-community-btn');
+    
+    // Footer Elements
+    const footerLinks = document.querySelectorAll('.footer-link');
+    const socialLinks = document.querySelectorAll('.social-link');
+    
+    // Variables for sticker image upload
+    let currentStickerId = null;
+    
+    // Payment Processing Variables
+    let currentPaymentMethod = 'card';
+    let isProcessingPayment = false;
+    
+    // Payment Processing Elements
+    const paymentProcessing = document.getElementById('payment-processing');
+    const paymentMessage = document.getElementById('payment-message');
+    const paymentSuccess = document.getElementById('payment-success');
+    const paymentError = document.getElementById('payment-error');
+    const paymentDoneBtn = document.getElementById('payment-done-btn');
+    
+    // Payment Method Elements
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const creditCardForm = document.getElementById('credit-card-form');
+    const paypalForm = document.getElementById('paypal-form');
+    const appleForm = document.getElementById('apple-form');
+    
+    // Card Preview Elements
+    const cardNumberInput = document.getElementById('card-number');
+    const expiryDateInput = document.getElementById('expiry-date');
+    const cvvInput = document.getElementById('cvv');
+    const cardNameInput = document.getElementById('card-name');
+    const previewCardNumber = document.getElementById('preview-card-number');
+    const previewExpiry = document.getElementById('preview-expiry');
+    const previewCardName = document.getElementById('preview-card-name');
+    
+    // ============================================
+    // IMAGE STORAGE FUNCTIONS (ADD THIS BLOCK)
+    // ============================================
+    
+    // Save uploaded sticker images to localStorage
+    function saveImagesToStorage() {
+        try {
+            const imageData = [];
+            stickers.forEach(sticker => {
+                if (sticker.customImage) {
+                    imageData.push({ id: sticker.id, image: sticker.customImage });
+                }
+            });
+            localStorage.setItem('suraya_sticker_images', JSON.stringify(imageData));
+            console.log('✅ Sticker images saved to storage');
+        } catch (error) {
+            console.error('Error saving sticker images:', error);
+        }
+    }
+    
+    // Load sticker images from localStorage
+    function loadImagesFromStorage() {
+        try {
+            const savedImages = localStorage.getItem('suraya_sticker_images');
+            if (savedImages) {
+                const imageData = JSON.parse(savedImages);
+                console.log(`📸 Loading ${imageData.length} saved sticker images`);
+                imageData.forEach(data => {
+                    const sticker = stickers.find(s => s.id === data.id);
+                    if (sticker) {
+                        sticker.customImage = data.image;
+                    }
+                });
+                renderStickers();
+            }
+        } catch (error) {
+            console.error('Error loading sticker images:', error);
+        }
+    }
+    
+    // Save gallery images to localStorage
+    function saveGalleryImagesToStorage() {
+        try {
+            if (surpriseImages && surpriseImages.length > 0) {
+                localStorage.setItem('suraya_gallery_images', JSON.stringify(surpriseImages));
+                console.log('✅ Gallery images saved to storage');
+            }
+        } catch (error) {
+            console.error('Error saving gallery images:', error);
+        }
+    }
+    
+    // Load gallery images from localStorage
+    function loadGalleryImagesFromStorage() {
+        try {
+            const savedGallery = localStorage.getItem('suraya_gallery_images');
+            if (savedGallery) {
+                surpriseImages = JSON.parse(savedGallery);
+                renderGallery();
+                console.log('📸 Gallery images loaded from storage');
+            }
+        } catch (error) {
+            console.error('Error loading gallery images:', error);
+        }
+    }
+    
+    // ============================================
+    // FIXED: WORKING PAYPAL BUTTON
+    // ============================================
+    
+    // Get the PayPal button
+    const paypalButton = document.getElementById('real-paypal-button');
+    
+    if (paypalButton) {
+        paypalButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get customer info
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const zip = document.getElementById('zip').value;
+            const country = document.getElementById('country').value;
+            
+            // Validate required fields
+            if (!firstName || !email || !address) {
+                alert('❌ Please fill in your first name, email, and shipping address');
+                return;
+            }
+            
+            // Check if cart has items
+            if (cart.length === 0) {
+                alert('❌ Your cart is empty. Please add items before checking out.');
+                return;
+            }
+            
+            // Calculate total
+            let subtotal = 0;
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+            });
+            const total = (subtotal + shippingCost).toFixed(2);
+            
+            // Build order summary
+            let orderItems = "";
+            cart.forEach(item => {
+                orderItems += `${item.title} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+            
+            // Create order object
+            const orderId = 'ORD-' + Date.now();
+            const order = {
+                id: orderId,
+                date: new Date().toISOString(),
+                customerName: `${firstName} ${lastName}`,
+                email: email,
+                shippingAddress: `${address}, ${city}, ${zip}, ${country}`,
+                items: cart.map(item => ({
+                    title: item.title,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                subtotal: subtotal,
+                shipping: shippingCost,
+                total: total,
+                status: 'pending',
+                paymentMethod: 'paypal'
+            };
+            
+            // Save order to localStorage
+            orders.push(order);
+            localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
+            
+            // Add order to user's history if logged in
+            if (currentUser) {
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    users[userIndex].orders.push(orderId);
+                    localStorage.setItem('stickerShopUsers', JSON.stringify(users));
+                    currentUser.orders.push(orderId);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+            }
+            
+            // Show confirmation
+            alert(`✅ ORDER RECEIVED!\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOrder ID: ${orderId}\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nShipping: ${address}, ${city}, ${zip}, ${country}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nItems:\n${orderItems}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSubtotal: $${subtotal.toFixed(2)}\nShipping: $${shippingCost.toFixed(2)}\nTOTAL: $${total}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📧 A PayPal invoice will be sent to ${email} within 24 hours.\n💳 You can pay securely with credit card or PayPal.\n\nYou will now be redirected to PayPal to complete your payment.`);
+            
+            // Clear cart
+            cart = [];
+            updateCart();
+            
+            // Close checkout form
+            checkoutForm.style.display = 'none';
+            
+            // Clear form fields
+            document.getElementById('first-name').value = '';
+            document.getElementById('last-name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('zip').value = '';
+            
+            // Open PayPal in new tab
+            window.open('https://www.paypal.com/paypalme/smushahe', '_blank');
+        });
+    }
+    
+    // ============================================
+    // END OF PAYPAL FIX
+    // ============================================
+    
+    // Initialize the app
+    function init() {
+        try {
+            renderStickers();
+            renderGallery();
+            renderCommunityGallery();
+            updateCart();
+            setupEventListeners();
+            setupAccessControlListeners();
+            setupPaymentListeners();
+            startGalleryAutoSlide();
+            checkLoginStatus();
+            loadOrderHistory();
+            
+            // ===== LOAD SAVED IMAGES =====
+            loadImagesFromStorage();
+            loadGalleryImagesFromStorage();
+            // ==============================
+            
+            // Make all buttons active
+            activateAllButtons();
+            
+            console.log("Afghan Sticker Artistry initialized successfully!");
+        } catch (error) {
+            console.error("Initialization error:", error);
+            alert("There was an error initializing the application. Please refresh the page.");
+        }
+    }
+    
+    // Function to activate all buttons
+    function activateAllButtons() {
+        const allButtons = document.querySelectorAll('button, .btn, .auth-tab, .tab-btn, .user-menu-item, .footer-links a, .social-icons a, .gallery-nav, .dot, .qty-btn, .add-cart-btn, .remove-item, .checkout-btn, .subscribe-btn, .upload-community-btn, .profile-upload-btn, .edit-sticker-btn, .delete-sticker-btn, .access-toggle, .dev-option, .scroll-down');
         
-        // Access Control
-        let isUnlocked = false;
-        const ACCESS_CODE = "Mushahed@490";
+        allButtons.forEach(button => {
+            if (!button.hasAttribute('data-listener-added')) {
+                button.setAttribute('data-listener-added', 'true');
+                
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '';
+                });
+                
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'translateY(1px)';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+            }
+        });
+    }
+    
+    // ACCESS CONTROL FUNCTIONS
+    function unlockAccess() {
+        try {
+            const password = accessPassword.value;
+            
+            if (password === ACCESS_CODE) {
+                isUnlocked = true;
+                accessStatus.textContent = "Access granted!";
+                accessStatus.style.color = "#8a8840";
+                accessPanel.classList.remove('active');
+                devPanel.classList.add('active');
+                accessToggle.innerHTML = '<i class="fas fa-unlock"></i>';
+                accessToggle.style.background = "#8a8840";
+                accessPassword.value = "";
+                
+                adminTabBtn.disabled = false;
+                adminTabBtn.style.opacity = "1";
+                adminTabBtn.style.cursor = "pointer";
+                
+                if (document.getElementById('admin-tab').classList.contains('active')) {
+                    adminPanel.classList.add('active');
+                }
+                
+                renderStickers();
+                
+                console.log('Access unlocked successfully');
+            } else {
+                accessStatus.textContent = "Invalid access code!";
+                accessStatus.style.color = "#8b4513";
+                accessPassword.value = "";
+            }
+        } catch (error) {
+            console.error("Error in unlockAccess:", error);
+        }
+    }
+    
+    function lockAccess() {
+        try {
+            isUnlocked = false;
+            devPanel.classList.remove('active');
+            uploadSection.classList.remove('active');
+            stickerUploadSection.classList.remove('active');
+            accessToggle.innerHTML = '<i class="fas fa-lock"></i>';
+            accessToggle.style.background = "#757331";
+            accessStatus.textContent = "";
+            
+            adminTabBtn.disabled = true;
+            adminTabBtn.style.opacity = "0.5";
+            adminTabBtn.style.cursor = "not-allowed";
+            
+            adminPanel.classList.remove('active');
+            
+            if (document.getElementById('admin-tab').classList.contains('active')) {
+                document.getElementById('admin-tab').classList.remove('active');
+                document.getElementById('shop-tab').classList.add('active');
+                adminTabBtn.classList.remove('active');
+                document.querySelector('[data-tab="shop"]').classList.add('active');
+            }
+            
+            renderStickers();
+            
+            console.log('Access locked');
+        } catch (error) {
+            console.error("Error in lockAccess:", error);
+        }
+    }
+
+    function setupAccessControlListeners() {
+        accessToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            if (isUnlocked) {
+                devPanel.classList.toggle('active');
+                accessPanel.classList.remove('active');
+            } else {
+                accessPanel.classList.toggle('active');
+                devPanel.classList.remove('active');
+            }
+        });
         
-        // User Authentication
-        let currentUser = null;
-        let users = JSON.parse(localStorage.getItem('stickerShopUsers')) || [
-            {
-                id: 1,
-                name: "Demo User",
-                email: "user@example.com",
-                password: "password123",
+        accessSubmit.addEventListener('click', function(e) {
+            e.stopPropagation();
+            unlockAccess();
+        });
+        
+        accessPassword.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                unlockAccess();
+            }
+        });
+
+        devLogoutBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            lockAccess();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!accessToggle.contains(e.target) && 
+                !accessPanel.contains(e.target) && 
+                !devPanel.contains(e.target)) {
+                accessPanel.classList.remove('active');
+                devPanel.classList.remove('active');
+            }
+        });
+
+        accessPanel.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        devPanel.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // PAYMENT PROCESSING FUNCTIONS
+    function setupPaymentListeners() {
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                paymentMethods.forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentPaymentMethod = this.getAttribute('data-method');
+                
+                creditCardForm.classList.remove('active');
+                paypalForm.classList.remove('active');
+                appleForm.classList.remove('active');
+                
+                if (currentPaymentMethod === 'card') {
+                    creditCardForm.classList.add('active');
+                } else if (currentPaymentMethod === 'paypal') {
+                    paypalForm.classList.add('active');
+                } else if (currentPaymentMethod === 'apple') {
+                    appleForm.classList.add('active');
+                }
+            });
+        });
+        
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function() {
+                let value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = '';
+                
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && i % 4 === 0) {
+                        formattedValue += ' ';
+                    }
+                    formattedValue += value[i];
+                }
+                
+                this.value = formattedValue;
+                
+                if (value.length > 0) {
+                    previewCardNumber.textContent = formattedValue;
+                } else {
+                    previewCardNumber.textContent = '**** **** **** ****';
+                }
+            });
+            
+            expiryDateInput.addEventListener('input', function() {
+                let value = this.value.replace(/[^0-9]/g, '');
+                
+                if (value.length >= 2) {
+                    this.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                
+                if (value.length > 0) {
+                    previewExpiry.textContent = this.value;
+                } else {
+                    previewExpiry.textContent = 'MM/YY';
+                }
+            });
+            
+            cvvInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            
+            cardNameInput.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    previewCardName.textContent = this.value;
+                } else {
+                    previewCardName.textContent = 'Your Name';
+                }
+            });
+        }
+        
+        paymentDoneBtn.addEventListener('click', function() {
+            hidePaymentProcessing();
+            checkoutDetailsForm.reset();
+            cart = [];
+            updateCart();
+            hideCheckoutForm();
+            
+            previewCardNumber.textContent = '**** **** **** ****';
+            previewExpiry.textContent = 'MM/YY';
+            previewCardName.textContent = 'Your Name';
+        });
+    }
+    
+    function processPayment(formData) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const isSuccess = Math.random() > 0.1;
+                
+                if (isSuccess) {
+                    resolve({
+                        success: true,
+                        transactionId: 'TXN-' + Math.floor(Math.random() * 1000000000),
+                        message: 'Payment processed successfully'
+                    });
+                } else {
+                    reject({
+                        success: false,
+                        error: 'Payment declined. Please check your payment details and try again.'
+                    });
+                }
+            }, 3000);
+        });
+    }
+    
+    function validatePaymentForm() {
+        if (currentPaymentMethod === 'card') {
+            const cardNumber = cardNumberInput.value.replace(/\s+/g, '');
+            const expiryDate = expiryDateInput.value;
+            const cvv = cvvInput.value;
+            const cardName = cardNameInput.value;
+            
+            if (cardNumber.length !== 16) {
+                alert('Please enter a valid 16-digit card number');
+                return false;
+            }
+            
+            if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
+                alert('Please enter a valid expiry date in MM/YY format');
+                return false;
+            }
+            
+            if (cvv.length !== 3) {
+                alert('Please enter a valid 3-digit CVV');
+                return false;
+            }
+            
+            if (cardName.trim().length < 2) {
+                alert('Please enter the name on your card');
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    function showPaymentProcessing() {
+        paymentProcessing.style.display = 'flex';
+        paymentMessage.style.display = 'block';
+        paymentSuccess.style.display = 'none';
+        paymentError.style.display = 'none';
+        paymentDoneBtn.style.display = 'none';
+        isProcessingPayment = true;
+    }
+    
+    function showPaymentSuccess(transactionId) {
+        paymentMessage.style.display = 'none';
+        paymentSuccess.style.display = 'block';
+        paymentError.style.display = 'none';
+        paymentDoneBtn.style.display = 'block';
+        paymentSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Payment Successful!<br><small>Transaction ID: ${transactionId}</small>`;
+        isProcessingPayment = false;
+    }
+    
+    function showPaymentError(error) {
+        paymentMessage.style.display = 'none';
+        paymentSuccess.style.display = 'none';
+        paymentError.style.display = 'block';
+        paymentDoneBtn.style.display = 'block';
+        paymentError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error}`;
+        isProcessingPayment = false;
+    }
+    
+    function hidePaymentProcessing() {
+        paymentProcessing.style.display = 'none';
+    }
+    
+    // USER AUTHENTICATION FUNCTIONS
+    function checkLoginStatus() {
+        try {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUIForLoggedInUser();
+            }
+        } catch (error) {
+            console.error("Error checking login status:", error);
+        }
+    }
+
+    function updateUIForLoggedInUser() {
+        authBtn.style.display = 'none';
+        userProfile.classList.add('active');
+        userName.textContent = currentUser.name;
+        authModal.classList.remove('active');
+    }
+
+    function updateUIForLoggedOutUser() {
+        authBtn.style.display = 'flex';
+        userProfile.classList.remove('active');
+        userMenu.classList.remove('active');
+    }
+
+    function loginUser(email, password) {
+        try {
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = { ...user };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUIForLoggedInUser();
+                alert(`Welcome back, ${user.name}!`);
+                return true;
+            } else {
+                alert('Invalid email or password!');
+                return false;
+            }
+        } catch (error) {
+            console.error("Error in loginUser:", error);
+            alert("There was an error logging in. Please try again.");
+            return false;
+        }
+    }
+
+    function signupUser(name, email, password) {
+        try {
+            if (users.find(u => u.email === email)) {
+                alert('User with this email already exists!');
+                return false;
+            }
+
+            const newUser = {
+                id: users.length + 1,
+                name,
+                email,
+                password,
                 profile: {
                     avatar: "https://via.placeholder.com/150",
                     phone: "",
@@ -3062,2194 +3817,1511 @@
                     theme: "default"
                 },
                 orders: []
-            }
-        ];
+            };
 
-        // Orders storage
-        let orders = JSON.parse(localStorage.getItem('stickerShopOrders')) || [];
-        
-        // Subscriptions storage
-        let subscriptions = JSON.parse(localStorage.getItem('stickerShopSubscriptions')) || [];
-        
-        // Surprise images for gallery
-        let surpriseImages = [
-            {
-                image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?w=800",
-                caption: "Traditional Afghan Pattern"
-            },
-            {
-                image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800",
-                caption: "Cultural Heritage Design"
-            }
-        ];
-        
-        // Community gallery images
-        let communityImages = [
-            {
-                image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=800",
-                caption: "Amazing sticker designs!",
-                user: "ArtLover123",
-                avatar: "https://randomuser.me/api/portraits/women/1.jpg"
-            },
-            {
-                image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800",
-                caption: "Love these cultural stickers!",
-                user: "CultureExplorer",
-                avatar: "https://randomuser.me/api/portraits/men/2.jpg"
-            }
-        ];
-        
-        // DOM Elements
-        const stickerContainer = document.getElementById('sticker-container');
-        const cartItems = document.getElementById('cart-items');
-        const cartTotal = document.getElementById('cart-total');
-        const checkoutBtn = document.getElementById('checkout-btn');
-        const checkoutForm = document.getElementById('checkout-form');
-        const checkoutCancelBtn = document.getElementById('checkout-cancel-btn');
-        const checkoutDetailsForm = document.getElementById('checkout-details-form');
-        const checkoutItems = document.getElementById('checkout-items');
-        const checkoutShipping = document.getElementById('checkout-shipping');
-        const checkoutTotal = document.getElementById('checkout-total');
-        const addStickerForm = document.getElementById('add-sticker-form');
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const galleryContainer = document.getElementById('gallery-container');
-        const galleryDots = document.getElementById('gallery-dots');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const adminPanel = document.getElementById('admin-panel');
-        const adminTabBtn = document.getElementById('admin-tab-btn');
-        const scrollDownBtn = document.getElementById('scroll-down');
-        
-        // Access Control Elements
-        const accessToggle = document.getElementById('access-toggle');
-        const accessPanel = document.getElementById('access-panel');
-        const accessPassword = document.getElementById('access-password');
-        const accessSubmit = document.getElementById('access-submit');
-        const accessStatus = document.getElementById('access-status');
-        
-        // Developer Panel Elements
-        const devPanel = document.getElementById('dev-panel');
-        const toggleUploadBtn = document.getElementById('toggle-upload');
-        const toggleStickerUploadBtn = document.getElementById('toggle-sticker-upload');
-        const clearGalleryBtn = document.getElementById('clear-gallery');
-        const addSampleImagesBtn = document.getElementById('add-sample-images');
-        const exportDataBtn = document.getElementById('export-data');
-        const devLogoutBtn = document.getElementById('dev-logout');
-        
-        // Image Upload Elements
-        const uploadSection = document.getElementById('upload-section');
-        const uploadArea = document.getElementById('upload-area');
-        const imageUpload = document.getElementById('image-upload');
-        const uploadPreview = document.getElementById('upload-preview');
-        const uploadActions = document.getElementById('upload-actions');
-        const confirmUpload = document.getElementById('confirm-upload');
-        const cancelUpload = document.getElementById('cancel-upload');
-        const imageCaption = document.getElementById('image-caption');
-        const uploadSuccess = document.getElementById('upload-success');
-        
-        // Sticker Image Upload Elements
-        const stickerUploadSection = document.getElementById('sticker-upload-section');
-        const stickerUploadArea = document.getElementById('sticker-upload-area');
-        const stickerImageUpload = document.getElementById('sticker-image-upload');
-        const stickerUploadPreview = document.getElementById('sticker-upload-preview');
-        const stickerUploadActions = document.getElementById('sticker-upload-actions');
-        const stickerConfirmUpload = document.getElementById('sticker-confirm-upload');
-        const stickerCancelUpload = document.getElementById('sticker-cancel-upload');
-        const stickerUploadSuccess = document.getElementById('sticker-upload-success');
-        
-        // User Authentication Elements
-        const authBtn = document.getElementById('auth-btn');
-        const authText = document.getElementById('auth-text');
-        const userProfile = document.getElementById('user-profile');
-        const userName = document.getElementById('user-name');
-        const authModal = document.getElementById('auth-modal');
-        const userMenu = document.getElementById('user-menu');
-        const authTabs = document.querySelectorAll('.auth-tab');
-        const authForms = document.querySelectorAll('.auth-form');
-        const loginSubmit = document.getElementById('login-submit');
-        const signupSubmit = document.getElementById('signup-submit');
-        const logoutBtn = document.getElementById('logout-btn');
-        const profileBtn = document.getElementById('profile-btn');
-        const trackOrderBtn = document.getElementById('track-order-btn');
-        const orderHistoryBtn = document.getElementById('order-history-btn');
-        
-        // Profile Elements
-        const profileSection = document.getElementById('profile-section');
-        const profileAvatar = document.getElementById('profile-avatar');
-        const avatarUpload = document.getElementById('avatar-upload');
-        const avatarUploadBtn = document.getElementById('avatar-upload-btn');
-        const profileName = document.getElementById('profile-name');
-        const profileEmail = document.getElementById('profile-email');
-        const profilePhone = document.getElementById('profile-phone');
-        const profileBio = document.getElementById('profile-bio');
-        const profileAddress = document.getElementById('profile-address');
-        const profileTheme = document.getElementById('profile-theme');
-        const saveProfile = document.getElementById('save-profile');
-        const cancelProfile = document.getElementById('cancel-profile');
-        const profileSuccess = document.getElementById('profile-success');
-        
-        // Track Order Elements
-        const trackOrderSection = document.getElementById('track-order-section');
-        const orderIdInput = document.getElementById('order-id-input');
-        const trackOrderSubmit = document.getElementById('track-order-btn');
-        const orderStatus = document.getElementById('order-status');
-        
-        // Order History Elements
-        const orderHistorySection = document.getElementById('order-history-section');
-        const ordersList = document.getElementById('orders-list');
-        
-        // Subscription Elements
-        const subscribeBtns = document.querySelectorAll('.subscribe-btn');
-        
-        // Community Gallery Elements
-        const communityGrid = document.getElementById('community-grid');
-        const uploadCommunityBtn = document.getElementById('upload-community-btn');
-        
-        // Footer Elements
-        const footerLinks = document.querySelectorAll('.footer-link');
-        const socialLinks = document.querySelectorAll('.social-link');
-        
-        // Variables for sticker image upload
-        let currentStickerId = null;
-        
-        // Payment Processing Variables
-        let currentPaymentMethod = 'card';
-        let isProcessingPayment = false;
-        
-        // Payment Processing Elements
-        const paymentProcessing = document.getElementById('payment-processing');
-        const paymentMessage = document.getElementById('payment-message');
-        const paymentSuccess = document.getElementById('payment-success');
-        const paymentError = document.getElementById('payment-error');
-        const paymentDoneBtn = document.getElementById('payment-done-btn');
-        
-        // Payment Method Elements
-        const paymentMethods = document.querySelectorAll('.payment-method');
-        const creditCardForm = document.getElementById('credit-card-form');
-        const paypalForm = document.getElementById('paypal-form');
-        const appleForm = document.getElementById('apple-form');
-        
-        // Card Preview Elements
-        const cardNumberInput = document.getElementById('card-number');
-        const expiryDateInput = document.getElementById('expiry-date');
-        const cvvInput = document.getElementById('cvv');
-        const cardNameInput = document.getElementById('card-name');
-        const previewCardNumber = document.getElementById('preview-card-number');
-        const previewExpiry = document.getElementById('preview-expiry');
-        const previewCardName = document.getElementById('preview-card-name');
-        
-        // ============================================
-        // FIXED: WORKING PAYPAL BUTTON
-        // ============================================
-        
-        // Get the PayPal button
-        const paypalButton = document.getElementById('real-paypal-button');
-        
-        if (paypalButton) {
-            paypalButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Get customer info
-                const firstName = document.getElementById('first-name').value;
-                const lastName = document.getElementById('last-name').value;
-                const email = document.getElementById('email').value;
-                const address = document.getElementById('address').value;
-                const city = document.getElementById('city').value;
-                const zip = document.getElementById('zip').value;
-                const country = document.getElementById('country').value;
-                
-                // Validate required fields
-                if (!firstName || !email || !address) {
-                    alert('❌ Please fill in your first name, email, and shipping address');
-                    return;
-                }
-                
-                // Check if cart has items
-                if (cart.length === 0) {
-                    alert('❌ Your cart is empty. Please add items before checking out.');
-                    return;
-                }
-                
-                // Calculate total
-                let subtotal = 0;
-                cart.forEach(item => {
-                    subtotal += item.price * item.quantity;
-                });
-                const total = (subtotal + shippingCost).toFixed(2);
-                
-                // Build order summary
-                let orderItems = "";
-                cart.forEach(item => {
-                    orderItems += `${item.title} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}\n`;
-                });
-                
-                // Create order object
-                const orderId = 'ORD-' + Date.now();
-                const order = {
-                    id: orderId,
-                    date: new Date().toISOString(),
-                    customerName: `${firstName} ${lastName}`,
-                    email: email,
-                    shippingAddress: `${address}, ${city}, ${zip}, ${country}`,
-                    items: cart.map(item => ({
-                        title: item.title,
-                        quantity: item.quantity,
-                        price: item.price
-                    })),
-                    subtotal: subtotal,
-                    shipping: shippingCost,
-                    total: total,
-                    status: 'pending',
-                    paymentMethod: 'paypal'
-                };
-                
-                // Save order to localStorage
-                orders.push(order);
-                localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
-                
-                // Add order to user's history if logged in
-                if (currentUser) {
-                    const userIndex = users.findIndex(u => u.id === currentUser.id);
-                    if (userIndex !== -1) {
-                        users[userIndex].orders.push(orderId);
-                        localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                        currentUser.orders.push(orderId);
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    }
-                }
-                
-                // Show confirmation
-                alert(`✅ ORDER RECEIVED!\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nOrder ID: ${orderId}\nCustomer: ${firstName} ${lastName}\nEmail: ${email}\nShipping: ${address}, ${city}, ${zip}, ${country}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nItems:\n${orderItems}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nSubtotal: $${subtotal.toFixed(2)}\nShipping: $${shippingCost.toFixed(2)}\nTOTAL: $${total}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📧 A PayPal invoice will be sent to ${email} within 24 hours.\n💳 You can pay securely with credit card or PayPal.\n\nYou will now be redirected to PayPal to complete your payment.`);
-                
-                // Clear cart
-                cart = [];
-                updateCart();
-                
-                // Close checkout form
-                checkoutForm.style.display = 'none';
-                
-                // Clear form fields
-                document.getElementById('first-name').value = '';
-                document.getElementById('last-name').value = '';
-                document.getElementById('email').value = '';
-                document.getElementById('address').value = '';
-                document.getElementById('city').value = '';
-                document.getElementById('zip').value = '';
-                
-                // Open PayPal in new tab
-                window.open('https://www.paypal.com/paypalme/smushahe', '_blank');
-            });
-        }
-        
-        // ============================================
-        // END OF PAYPAL FIX
-        // ============================================
-        
-        // Initialize the app
-        function init() {
-            try {
-                renderStickers();
-                renderGallery();
-                renderCommunityGallery();
-                updateCart();
-                setupEventListeners();
-                setupAccessControlListeners();
-                setupPaymentListeners();
-                startGalleryAutoSlide();
-                checkLoginStatus();
-                loadOrderHistory();
-                
-                // Make all buttons active
-                activateAllButtons();
-                
-                console.log("Afghan Sticker Artistry initialized successfully!");
-            } catch (error) {
-                console.error("Initialization error:", error);
-                alert("There was an error initializing the application. Please refresh the page.");
-            }
-        }
-        
-        // Function to activate all buttons
-        function activateAllButtons() {
-            const allButtons = document.querySelectorAll('button, .btn, .auth-tab, .tab-btn, .user-menu-item, .footer-links a, .social-icons a, .gallery-nav, .dot, .qty-btn, .add-cart-btn, .remove-item, .checkout-btn, .subscribe-btn, .upload-community-btn, .profile-upload-btn, .edit-sticker-btn, .delete-sticker-btn, .access-toggle, .dev-option, .scroll-down');
+            users.push(newUser);
+            localStorage.setItem('stickerShopUsers', JSON.stringify(users));
             
-            allButtons.forEach(button => {
-                if (!button.hasAttribute('data-listener-added')) {
-                    button.setAttribute('data-listener-added', 'true');
-                    
-                    button.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-2px)';
-                        this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-                    });
-                    
-                    button.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0)';
-                        this.style.boxShadow = '';
-                    });
-                    
-                    button.addEventListener('mousedown', function() {
-                        this.style.transform = 'translateY(1px)';
-                    });
-                    
-                    button.addEventListener('mouseup', function() {
-                        this.style.transform = 'translateY(-2px)';
-                    });
-                }
-            });
-        }
-        
-        // ACCESS CONTROL FUNCTIONS
-        function unlockAccess() {
-            try {
-                const password = accessPassword.value;
-                
-                if (password === ACCESS_CODE) {
-                    isUnlocked = true;
-                    accessStatus.textContent = "Access granted!";
-                    accessStatus.style.color = "#8a8840";
-                    accessPanel.classList.remove('active');
-                    devPanel.classList.add('active');
-                    accessToggle.innerHTML = '<i class="fas fa-unlock"></i>';
-                    accessToggle.style.background = "#8a8840";
-                    accessPassword.value = "";
-                    
-                    adminTabBtn.disabled = false;
-                    adminTabBtn.style.opacity = "1";
-                    adminTabBtn.style.cursor = "pointer";
-                    
-                    if (document.getElementById('admin-tab').classList.contains('active')) {
-                        adminPanel.classList.add('active');
-                    }
-                    
-                    renderStickers();
-                    
-                    console.log('Access unlocked successfully');
-                } else {
-                    accessStatus.textContent = "Invalid access code!";
-                    accessStatus.style.color = "#8b4513";
-                    accessPassword.value = "";
-                }
-            } catch (error) {
-                console.error("Error in unlockAccess:", error);
-            }
-        }
-        
-        function lockAccess() {
-            try {
-                isUnlocked = false;
-                devPanel.classList.remove('active');
-                uploadSection.classList.remove('active');
-                stickerUploadSection.classList.remove('active');
-                accessToggle.innerHTML = '<i class="fas fa-lock"></i>';
-                accessToggle.style.background = "#757331";
-                accessStatus.textContent = "";
-                
-                adminTabBtn.disabled = true;
-                adminTabBtn.style.opacity = "0.5";
-                adminTabBtn.style.cursor = "not-allowed";
-                
-                adminPanel.classList.remove('active');
-                
-                if (document.getElementById('admin-tab').classList.contains('active')) {
-                    document.getElementById('admin-tab').classList.remove('active');
-                    document.getElementById('shop-tab').classList.add('active');
-                    adminTabBtn.classList.remove('active');
-                    document.querySelector('[data-tab="shop"]').classList.add('active');
-                }
-                
-                renderStickers();
-                
-                console.log('Access locked');
-            } catch (error) {
-                console.error("Error in lockAccess:", error);
-            }
-        }
-
-        function setupAccessControlListeners() {
-            accessToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                
-                if (isUnlocked) {
-                    devPanel.classList.toggle('active');
-                    accessPanel.classList.remove('active');
-                } else {
-                    accessPanel.classList.toggle('active');
-                    devPanel.classList.remove('active');
-                }
-            });
-            
-            accessSubmit.addEventListener('click', function(e) {
-                e.stopPropagation();
-                unlockAccess();
-            });
-            
-            accessPassword.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    unlockAccess();
-                }
-            });
-
-            devLogoutBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                lockAccess();
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!accessToggle.contains(e.target) && 
-                    !accessPanel.contains(e.target) && 
-                    !devPanel.contains(e.target)) {
-                    accessPanel.classList.remove('active');
-                    devPanel.classList.remove('active');
-                }
-            });
-
-            accessPanel.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-
-            devPanel.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-        
-        // PAYMENT PROCESSING FUNCTIONS
-        function setupPaymentListeners() {
-            paymentMethods.forEach(method => {
-                method.addEventListener('click', function() {
-                    paymentMethods.forEach(m => m.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    currentPaymentMethod = this.getAttribute('data-method');
-                    
-                    creditCardForm.classList.remove('active');
-                    paypalForm.classList.remove('active');
-                    appleForm.classList.remove('active');
-                    
-                    if (currentPaymentMethod === 'card') {
-                        creditCardForm.classList.add('active');
-                    } else if (currentPaymentMethod === 'paypal') {
-                        paypalForm.classList.add('active');
-                    } else if (currentPaymentMethod === 'apple') {
-                        appleForm.classList.add('active');
-                    }
-                });
-            });
-            
-            if (cardNumberInput) {
-                cardNumberInput.addEventListener('input', function() {
-                    let value = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-                    let formattedValue = '';
-                    
-                    for (let i = 0; i < value.length; i++) {
-                        if (i > 0 && i % 4 === 0) {
-                            formattedValue += ' ';
-                        }
-                        formattedValue += value[i];
-                    }
-                    
-                    this.value = formattedValue;
-                    
-                    if (value.length > 0) {
-                        previewCardNumber.textContent = formattedValue;
-                    } else {
-                        previewCardNumber.textContent = '**** **** **** ****';
-                    }
-                });
-                
-                expiryDateInput.addEventListener('input', function() {
-                    let value = this.value.replace(/[^0-9]/g, '');
-                    
-                    if (value.length >= 2) {
-                        this.value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                    }
-                    
-                    if (value.length > 0) {
-                        previewExpiry.textContent = this.value;
-                    } else {
-                        previewExpiry.textContent = 'MM/YY';
-                    }
-                });
-                
-                cvvInput.addEventListener('input', function() {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                });
-                
-                cardNameInput.addEventListener('input', function() {
-                    if (this.value.length > 0) {
-                        previewCardName.textContent = this.value;
-                    } else {
-                        previewCardName.textContent = 'Your Name';
-                    }
-                });
-            }
-            
-            paymentDoneBtn.addEventListener('click', function() {
-                hidePaymentProcessing();
-                checkoutDetailsForm.reset();
-                cart = [];
-                updateCart();
-                hideCheckoutForm();
-                
-                previewCardNumber.textContent = '**** **** **** ****';
-                previewExpiry.textContent = 'MM/YY';
-                previewCardName.textContent = 'Your Name';
-            });
-        }
-        
-        function processPayment(formData) {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    const isSuccess = Math.random() > 0.1;
-                    
-                    if (isSuccess) {
-                        resolve({
-                            success: true,
-                            transactionId: 'TXN-' + Math.floor(Math.random() * 1000000000),
-                            message: 'Payment processed successfully'
-                        });
-                    } else {
-                        reject({
-                            success: false,
-                            error: 'Payment declined. Please check your payment details and try again.'
-                        });
-                    }
-                }, 3000);
-            });
-        }
-        
-        function validatePaymentForm() {
-            if (currentPaymentMethod === 'card') {
-                const cardNumber = cardNumberInput.value.replace(/\s+/g, '');
-                const expiryDate = expiryDateInput.value;
-                const cvv = cvvInput.value;
-                const cardName = cardNameInput.value;
-                
-                if (cardNumber.length !== 16) {
-                    alert('Please enter a valid 16-digit card number');
-                    return false;
-                }
-                
-                if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
-                    alert('Please enter a valid expiry date in MM/YY format');
-                    return false;
-                }
-                
-                if (cvv.length !== 3) {
-                    alert('Please enter a valid 3-digit CVV');
-                    return false;
-                }
-                
-                if (cardName.trim().length < 2) {
-                    alert('Please enter the name on your card');
-                    return false;
-                }
-            }
-            
+            currentUser = { ...newUser };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateUIForLoggedInUser();
+            alert(`Welcome to Afghan Sticker Artistry, ${name}!`);
             return true;
+        } catch (error) {
+            console.error("Error in signupUser:", error);
+            alert("There was an error creating your account. Please try again.");
+            return false;
         }
-        
-        function showPaymentProcessing() {
-            paymentProcessing.style.display = 'flex';
-            paymentMessage.style.display = 'block';
-            paymentSuccess.style.display = 'none';
-            paymentError.style.display = 'none';
-            paymentDoneBtn.style.display = 'none';
-            isProcessingPayment = true;
+    }
+
+    function logoutUser() {
+        try {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUIForLoggedOutUser();
+            alert('You have been logged out successfully!');
+        } catch (error) {
+            console.error("Error in logoutUser:", error);
         }
-        
-        function showPaymentSuccess(transactionId) {
-            paymentMessage.style.display = 'none';
-            paymentSuccess.style.display = 'block';
-            paymentError.style.display = 'none';
-            paymentDoneBtn.style.display = 'block';
-            paymentSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Payment Successful!<br><small>Transaction ID: ${transactionId}</small>`;
-            isProcessingPayment = false;
-        }
-        
-        function showPaymentError(error) {
-            paymentMessage.style.display = 'none';
-            paymentSuccess.style.display = 'none';
-            paymentError.style.display = 'block';
-            paymentDoneBtn.style.display = 'block';
-            paymentError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error}`;
-            isProcessingPayment = false;
-        }
-        
-        function hidePaymentProcessing() {
-            paymentProcessing.style.display = 'none';
-        }
-        
-        // USER AUTHENTICATION FUNCTIONS
-        function checkLoginStatus() {
-            try {
-                const savedUser = localStorage.getItem('currentUser');
-                if (savedUser) {
-                    currentUser = JSON.parse(savedUser);
-                    updateUIForLoggedInUser();
-                }
-            } catch (error) {
-                console.error("Error checking login status:", error);
+    }
+
+    // PROFILE FUNCTIONS
+    function showProfileSection() {
+        try {
+            if (!currentUser) {
+                alert('Please log in to view your profile!');
+                return;
             }
-        }
-
-        function updateUIForLoggedInUser() {
-            authBtn.style.display = 'none';
-            userProfile.classList.add('active');
-            userName.textContent = currentUser.name;
-            authModal.classList.remove('active');
-        }
-
-        function updateUIForLoggedOutUser() {
-            authBtn.style.display = 'flex';
-            userProfile.classList.remove('active');
+            
+            profileName.value = currentUser.name || '';
+            profileEmail.value = currentUser.email || '';
+            profilePhone.value = currentUser.profile?.phone || '';
+            profileBio.value = currentUser.profile?.bio || '';
+            profileAddress.value = currentUser.profile?.address || '';
+            profileTheme.value = currentUser.profile?.theme || 'default';
+            profileAvatar.src = currentUser.profile?.avatar || 'https://via.placeholder.com/150';
+            
+            profileSection.classList.add('active');
+            profileSection.scrollIntoView({ behavior: 'smooth' });
             userMenu.classList.remove('active');
+        } catch (error) {
+            console.error("Error in showProfileSection:", error);
+            alert("There was an error loading your profile. Please try again.");
         }
+    }
 
-        function loginUser(email, password) {
-            try {
-                const user = users.find(u => u.email === email && u.password === password);
-                if (user) {
-                    currentUser = { ...user };
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    updateUIForLoggedInUser();
-                    alert(`Welcome back, ${user.name}!`);
-                    return true;
-                } else {
-                    alert('Invalid email or password!');
-                    return false;
-                }
-            } catch (error) {
-                console.error("Error in loginUser:", error);
-                alert("There was an error logging in. Please try again.");
-                return false;
-            }
-        }
-
-        function signupUser(name, email, password) {
-            try {
-                if (users.find(u => u.email === email)) {
-                    alert('User with this email already exists!');
-                    return false;
-                }
-
-                const newUser = {
-                    id: users.length + 1,
-                    name,
-                    email,
-                    password,
-                    profile: {
-                        avatar: "https://via.placeholder.com/150",
-                        phone: "",
-                        bio: "",
-                        address: "",
-                        theme: "default"
-                    },
-                    orders: []
-                };
-
-                users.push(newUser);
+    function saveUserProfile() {
+        try {
+            if (!currentUser) return;
+            
+            currentUser.name = profileName.value;
+            currentUser.email = profileEmail.value;
+            currentUser.profile = {
+                ...currentUser.profile,
+                phone: profilePhone.value,
+                bio: profileBio.value,
+                address: profileAddress.value,
+                theme: profileTheme.value
+            };
+            
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex] = currentUser;
                 localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                
-                currentUser = { ...newUser };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                updateUIForLoggedInUser();
-                alert(`Welcome to Afghan Sticker Artistry, ${name}!`);
-                return true;
-            } catch (error) {
-                console.error("Error in signupUser:", error);
-                alert("There was an error creating your account. Please try again.");
-                return false;
             }
+            
+            userName.textContent = currentUser.name;
+            profileSuccess.style.display = 'block';
+            
+            setTimeout(() => {
+                profileSuccess.style.display = 'none';
+            }, 3000);
+        } catch (error) {
+            console.error("Error in saveUserProfile:", error);
+            alert("There was an error saving your profile. Please try again.");
         }
+    }
 
-        function logoutUser() {
-            try {
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                updateUIForLoggedOutUser();
-                alert('You have been logged out successfully!');
-            } catch (error) {
-                console.error("Error in logoutUser:", error);
-            }
-        }
-
-        // PROFILE FUNCTIONS
-        function showProfileSection() {
-            try {
-                if (!currentUser) {
-                    alert('Please log in to view your profile!');
+    function handleAvatarUpload() {
+        try {
+            const file = avatarUpload.files[0];
+            
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size exceeds 5MB limit. Please choose a smaller image.');
                     return;
                 }
                 
-                profileName.value = currentUser.name || '';
-                profileEmail.value = currentUser.email || '';
-                profilePhone.value = currentUser.profile?.phone || '';
-                profileBio.value = currentUser.profile?.bio || '';
-                profileAddress.value = currentUser.profile?.address || '';
-                profileTheme.value = currentUser.profile?.theme || 'default';
-                profileAvatar.src = currentUser.profile?.avatar || 'https://via.placeholder.com/150';
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, PNG, or GIF).');
+                    return;
+                }
                 
-                profileSection.classList.add('active');
-                profileSection.scrollIntoView({ behavior: 'smooth' });
-                userMenu.classList.remove('active');
-            } catch (error) {
-                console.error("Error in showProfileSection:", error);
-                alert("There was an error loading your profile. Please try again.");
-            }
-        }
-
-        function saveUserProfile() {
-            try {
-                if (!currentUser) return;
+                const reader = new FileReader();
                 
-                currentUser.name = profileName.value;
-                currentUser.email = profileEmail.value;
-                currentUser.profile = {
-                    ...currentUser.profile,
-                    phone: profilePhone.value,
-                    bio: profileBio.value,
-                    address: profileAddress.value,
-                    theme: profileTheme.value
+                reader.onload = function(e) {
+                    profileAvatar.src = e.target.result;
+                    
+                    if (currentUser) {
+                        currentUser.profile.avatar = e.target.result;
+                        const userIndex = users.findIndex(u => u.id === currentUser.id);
+                        if (userIndex !== -1) {
+                            users[userIndex] = currentUser;
+                            localStorage.setItem('stickerShopUsers', JSON.stringify(users));
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        }
+                    }
                 };
                 
-                const userIndex = users.findIndex(u => u.id === currentUser.id);
-                if (userIndex !== -1) {
-                    users[userIndex] = currentUser;
-                    localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                reader.readAsDataURL(file);
+            }
+        } catch (error) {
+            console.error("Error in handleAvatarUpload:", error);
+            alert("There was an error uploading your avatar. Please try again.");
+        }
+    }
+
+    // TRACK ORDER FUNCTIONS
+    function trackOrder(orderId) {
+        try {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                document.getElementById('detail-order-id').textContent = order.id;
+                document.getElementById('detail-order-date').textContent = new Date(order.date).toLocaleDateString();
+                document.getElementById('detail-delivery-date').textContent = new Date(order.estimatedDelivery).toLocaleDateString();
+                document.getElementById('detail-address').textContent = order.shippingAddress;
+                document.getElementById('status-text').textContent = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+                
+                const statusSteps = document.querySelectorAll('.status-step');
+                statusSteps.forEach(step => step.classList.remove('active', 'completed'));
+                
+                switch(order.status) {
+                    case 'placed':
+                        statusSteps[0].classList.add('completed');
+                        statusSteps[1].classList.add('active');
+                        break;
+                    case 'processing':
+                        statusSteps[0].classList.add('completed');
+                        statusSteps[1].classList.add('completed');
+                        statusSteps[2].classList.add('active');
+                        break;
+                    case 'shipped':
+                        statusSteps[0].classList.add('completed');
+                        statusSteps[1].classList.add('completed');
+                        statusSteps[2].classList.add('completed');
+                        statusSteps[3].classList.add('active');
+                        break;
+                    case 'delivered':
+                        statusSteps.forEach(step => step.classList.add('completed'));
+                        break;
                 }
                 
-                userName.textContent = currentUser.name;
-                profileSuccess.style.display = 'block';
-                
-                setTimeout(() => {
-                    profileSuccess.style.display = 'none';
-                }, 3000);
-            } catch (error) {
-                console.error("Error in saveUserProfile:", error);
-                alert("There was an error saving your profile. Please try again.");
+                orderStatus.classList.add('active');
+                trackOrderSection.classList.add('active');
+                trackOrderSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('Order not found. Please check your order ID and try again.');
             }
+        } catch (error) {
+            console.error("Error in trackOrder:", error);
+            alert("There was an error tracking your order. Please try again.");
         }
+    }
 
-        function handleAvatarUpload() {
-            try {
-                const file = avatarUpload.files[0];
-                
-                if (file) {
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('File size exceeds 5MB limit. Please choose a smaller image.');
-                        return;
-                    }
-                    
-                    if (!file.type.match('image.*')) {
-                        alert('Please select an image file (JPG, PNG, or GIF).');
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        profileAvatar.src = e.target.result;
-                        
-                        if (currentUser) {
-                            currentUser.profile.avatar = e.target.result;
-                            const userIndex = users.findIndex(u => u.id === currentUser.id);
-                            if (userIndex !== -1) {
-                                users[userIndex] = currentUser;
-                                localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                            }
-                        }
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            } catch (error) {
-                console.error("Error in handleAvatarUpload:", error);
-                alert("There was an error uploading your avatar. Please try again.");
+    function showTrackOrderSection() {
+        trackOrderSection.classList.add('active');
+        trackOrderSection.scrollIntoView({ behavior: 'smooth' });
+        userMenu.classList.remove('active');
+    }
+
+    // ORDER HISTORY FUNCTIONS
+    function loadOrderHistory() {
+        try {
+            if (!currentUser) return;
+            
+            const userOrders = orders.filter(order => 
+                currentUser.orders.includes(order.id)
+            );
+            
+            renderOrderHistory(userOrders);
+        } catch (error) {
+            console.error("Error in loadOrderHistory:", error);
+        }
+    }
+
+    function renderOrderHistory(userOrders) {
+        try {
+            ordersList.innerHTML = '';
+            
+            if (userOrders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="no-orders">
+                        <i class="fas fa-shopping-bag" style="font-size: 3rem; margin-bottom: 20px; color: #8a8840;"></i>
+                        <h3 style="color: #757331; margin-bottom: 10px;">No Orders Yet</h3>
+                        <p>Start shopping to see your order history here!</p>
+                    </div>
+                `;
+                return;
             }
-        }
-
-        // TRACK ORDER FUNCTIONS
-        function trackOrder(orderId) {
-            try {
-                const order = orders.find(o => o.id === orderId);
-                if (order) {
-                    document.getElementById('detail-order-id').textContent = order.id;
-                    document.getElementById('detail-order-date').textContent = new Date(order.date).toLocaleDateString();
-                    document.getElementById('detail-delivery-date').textContent = new Date(order.estimatedDelivery).toLocaleDateString();
-                    document.getElementById('detail-address').textContent = order.shippingAddress;
-                    document.getElementById('status-text').textContent = order.status.charAt(0).toUpperCase() + order.status.slice(1);
-                    
-                    const statusSteps = document.querySelectorAll('.status-step');
-                    statusSteps.forEach(step => step.classList.remove('active', 'completed'));
-                    
-                    switch(order.status) {
-                        case 'placed':
-                            statusSteps[0].classList.add('completed');
-                            statusSteps[1].classList.add('active');
-                            break;
-                        case 'processing':
-                            statusSteps[0].classList.add('completed');
-                            statusSteps[1].classList.add('completed');
-                            statusSteps[2].classList.add('active');
-                            break;
-                        case 'shipped':
-                            statusSteps[0].classList.add('completed');
-                            statusSteps[1].classList.add('completed');
-                            statusSteps[2].classList.add('completed');
-                            statusSteps[3].classList.add('active');
-                            break;
-                        case 'delivered':
-                            statusSteps.forEach(step => step.classList.add('completed'));
-                            break;
-                    }
-                    
-                    orderStatus.classList.add('active');
-                    trackOrderSection.classList.add('active');
-                    trackOrderSection.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert('Order not found. Please check your order ID and try again.');
-                }
-            } catch (error) {
-                console.error("Error in trackOrder:", error);
-                alert("There was an error tracking your order. Please try again.");
-            }
-        }
-
-        function showTrackOrderSection() {
-            trackOrderSection.classList.add('active');
-            trackOrderSection.scrollIntoView({ behavior: 'smooth' });
-            userMenu.classList.remove('active');
-        }
-
-        // ORDER HISTORY FUNCTIONS
-        function loadOrderHistory() {
-            try {
-                if (!currentUser) return;
+            
+            userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            userOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
                 
-                const userOrders = orders.filter(order => 
-                    currentUser.orders.includes(order.id)
-                );
+                const orderDate = new Date(order.date).toLocaleDateString();
                 
-                renderOrderHistory(userOrders);
-            } catch (error) {
-                console.error("Error in loadOrderHistory:", error);
-            }
-        }
-
-        function renderOrderHistory(userOrders) {
-            try {
-                ordersList.innerHTML = '';
-                
-                if (userOrders.length === 0) {
-                    ordersList.innerHTML = `
-                        <div class="no-orders">
-                            <i class="fas fa-shopping-bag" style="font-size: 3rem; margin-bottom: 20px; color: #8a8840;"></i>
-                            <h3 style="color: #757331; margin-bottom: 10px;">No Orders Yet</h3>
-                            <p>Start shopping to see your order history here!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                userOrders.forEach(order => {
-                    const orderCard = document.createElement('div');
-                    orderCard.className = 'order-card';
-                    
-                    const orderDate = new Date(order.date).toLocaleDateString();
-                    
-                    let itemsHtml = '';
-                    order.items.forEach(item => {
-                        itemsHtml += `
-                            <div class="order-item">
-                                <span>${item.title} (${item.quantity})</span>
-                                <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                        `;
-                    });
-                    
-                    orderCard.innerHTML = `
-                        <div class="order-header">
-                            <div>
-                                <div class="order-id">${order.id}</div>
-                                <div class="order-date">Ordered on ${orderDate}</div>
-                            </div>
-                            <div class="order-status">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</div>
-                        </div>
-                        <div class="order-items">
-                            ${itemsHtml}
-                        </div>
-                        <div class="order-total">
-                            <span>Total:</span>
-                            <span>${order.total}</span>
-                        </div>
-                        <div class="order-actions">
-                            <button class="track-order-btn-small" data-order="${order.id}">
-                                <i class="fas fa-shipping-fast"></i> Track Order
-                            </button>
-                            <button class="reorder-btn" data-order="${order.id}">
-                                <i class="fas fa-redo"></i> Reorder
-                            </button>
-                        </div>
-                    `;
-                    
-                    ordersList.appendChild(orderCard);
-                });
-                
-                document.querySelectorAll('.track-order-btn-small').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const orderId = this.getAttribute('data-order');
-                        orderIdInput.value = orderId;
-                        trackOrder(orderId);
-                        orderHistorySection.classList.remove('active');
-                    });
-                });
-                
-                document.querySelectorAll('.reorder-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const orderId = this.getAttribute('data-order');
-                        reorderItems(orderId);
-                    });
-                });
-            } catch (error) {
-                console.error("Error in renderOrderHistory:", error);
-            }
-        }
-
-        function showOrderHistory() {
-            try {
-                if (!currentUser) {
-                    alert('Please log in to view your order history!');
-                    return;
-                }
-                
-                loadOrderHistory();
-                orderHistorySection.classList.add('active');
-                orderHistorySection.scrollIntoView({ behavior: 'smooth' });
-                userMenu.classList.remove('active');
-            } catch (error) {
-                console.error("Error in showOrderHistory:", error);
-                alert("There was an error loading your order history. Please try again.");
-            }
-        }
-
-        function reorderItems(orderId) {
-            try {
-                const order = orders.find(o => o.id === orderId);
-                if (!order) return;
-                
-                cart = [];
-                
+                let itemsHtml = '';
                 order.items.forEach(item => {
-                    cart.push({
-                        id: item.id,
-                        title: item.title,
-                        price: item.price,
-                        quantity: item.quantity
-                    });
+                    itemsHtml += `
+                        <div class="order-item">
+                            <span>${item.title} (${item.quantity})</span>
+                            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    `;
                 });
                 
-                updateCart();
-                alert('Items from your order have been added to your cart!');
-                document.querySelector('.cart-summary').scrollIntoView({ behavior: 'smooth' });
-            } catch (error) {
-                console.error("Error in reorderItems:", error);
-                alert("There was an error adding items to your cart. Please try again.");
-            }
-        }
-        
-        // SUBSCRIPTION FUNCTIONS
-        function handleSubscription(plan) {
-            try {
-                if (!currentUser) {
-                    alert('Please log in to subscribe to our monthly sticker box!');
-                    return;
-                }
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">${order.id}</div>
+                            <div class="order-date">Ordered on ${orderDate}</div>
+                        </div>
+                        <div class="order-status">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</div>
+                    </div>
+                    <div class="order-items">
+                        ${itemsHtml}
+                    </div>
+                    <div class="order-total">
+                        <span>Total:</span>
+                        <span>${order.total}</span>
+                    </div>
+                    <div class="order-actions">
+                        <button class="track-order-btn-small" data-order="${order.id}">
+                            <i class="fas fa-shipping-fast"></i> Track Order
+                        </button>
+                        <button class="reorder-btn" data-order="${order.id}">
+                            <i class="fas fa-redo"></i> Reorder
+                        </button>
+                    </div>
+                `;
                 
-                const planDetails = {
-                    basic: { name: 'Basic Plan', price: 9.99, stickers: 3 },
-                    premium: { name: 'Premium Plan', price: 14.99, stickers: 6 },
-                    collector: { name: "Collector's Plan", price: 24.99, stickers: 10 }
+                ordersList.appendChild(orderCard);
+            });
+            
+            document.querySelectorAll('.track-order-btn-small').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order');
+                    orderIdInput.value = orderId;
+                    trackOrder(orderId);
+                    orderHistorySection.classList.remove('active');
+                });
+            });
+            
+            document.querySelectorAll('.reorder-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order');
+                    reorderItems(orderId);
+                });
+            });
+        } catch (error) {
+            console.error("Error in renderOrderHistory:", error);
+        }
+    }
+
+    function showOrderHistory() {
+        try {
+            if (!currentUser) {
+                alert('Please log in to view your order history!');
+                return;
+            }
+            
+            loadOrderHistory();
+            orderHistorySection.classList.add('active');
+            orderHistorySection.scrollIntoView({ behavior: 'smooth' });
+            userMenu.classList.remove('active');
+        } catch (error) {
+            console.error("Error in showOrderHistory:", error);
+            alert("There was an error loading your order history. Please try again.");
+        }
+    }
+
+    function reorderItems(orderId) {
+        try {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            cart = [];
+            
+            order.items.forEach(item => {
+                cart.push({
+                    id: item.id,
+                    title: item.title,
+                    price: item.price,
+                    quantity: item.quantity
+                });
+            });
+            
+            updateCart();
+            alert('Items from your order have been added to your cart!');
+            document.querySelector('.cart-summary').scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error("Error in reorderItems:", error);
+            alert("There was an error adding items to your cart. Please try again.");
+        }
+    }
+    
+    // SUBSCRIPTION FUNCTIONS
+    function handleSubscription(plan) {
+        try {
+            if (!currentUser) {
+                alert('Please log in to subscribe to our monthly sticker box!');
+                return;
+            }
+            
+            const planDetails = {
+                basic: { name: 'Basic Plan', price: 9.99, stickers: 3 },
+                premium: { name: 'Premium Plan', price: 14.99, stickers: 6 },
+                collector: { name: "Collector's Plan", price: 24.99, stickers: 10 }
+            };
+            
+            const selectedPlan = planDetails[plan];
+            
+            if (confirm(`Are you sure you want to subscribe to the ${selectedPlan.name} for $${selectedPlan.price}/month? You'll receive ${selectedPlan.stickers} unique stickers every month!`)) {
+                const subscription = {
+                    id: 'SUB-' + Math.floor(Math.random() * 1000000),
+                    userId: currentUser.id,
+                    plan: plan,
+                    planName: selectedPlan.name,
+                    price: selectedPlan.price,
+                    startDate: new Date().toISOString(),
+                    status: 'active',
+                    nextDelivery: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
                 };
                 
-                const selectedPlan = planDetails[plan];
+                subscriptions.push(subscription);
+                localStorage.setItem('stickerShopSubscriptions', JSON.stringify(subscriptions));
                 
-                if (confirm(`Are you sure you want to subscribe to the ${selectedPlan.name} for $${selectedPlan.price}/month? You'll receive ${selectedPlan.stickers} unique stickers every month!`)) {
-                    const subscription = {
-                        id: 'SUB-' + Math.floor(Math.random() * 1000000),
-                        userId: currentUser.id,
-                        plan: plan,
-                        planName: selectedPlan.name,
-                        price: selectedPlan.price,
-                        startDate: new Date().toISOString(),
-                        status: 'active',
-                        nextDelivery: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-                    };
-                    
-                    subscriptions.push(subscription);
-                    localStorage.setItem('stickerShopSubscriptions', JSON.stringify(subscriptions));
-                    
-                    alert(`Congratulations! You've subscribed to the ${selectedPlan.name}. Your first box will be shipped soon!`);
-                }
-            } catch (error) {
-                console.error("Error in handleSubscription:", error);
-                alert("There was an error processing your subscription. Please try again.");
+                alert(`Congratulations! You've subscribed to the ${selectedPlan.name}. Your first box will be shipped soon!`);
             }
+        } catch (error) {
+            console.error("Error in handleSubscription:", error);
+            alert("There was an error processing your subscription. Please try again.");
         }
-        
-        // COMMUNITY GALLERY FUNCTIONS
-        function renderCommunityGallery() {
-            try {
-                communityGrid.innerHTML = '';
-                
-                communityImages.forEach(item => {
-                    const communityItem = document.createElement('div');
-                    communityItem.className = 'community-item';
-                    communityItem.innerHTML = `
-                        <img src="${item.image}" alt="${item.caption}" class="community-image">
-                        <div class="community-info">
-                            <div class="community-user">
-                                <img src="${item.avatar}" alt="${item.user}" class="user-avatar">
-                                <span class="user-name">${item.user}</span>
-                            </div>
-                            <p class="community-caption">${item.caption}</p>
+    }
+    
+    // COMMUNITY GALLERY FUNCTIONS
+    function renderCommunityGallery() {
+        try {
+            communityGrid.innerHTML = '';
+            
+            communityImages.forEach(item => {
+                const communityItem = document.createElement('div');
+                communityItem.className = 'community-item';
+                communityItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.caption}" class="community-image">
+                    <div class="community-info">
+                        <div class="community-user">
+                            <img src="${item.avatar}" alt="${item.user}" class="user-avatar">
+                            <span class="user-name">${item.user}</span>
                         </div>
-                    `;
-                    communityGrid.appendChild(communityItem);
-                });
-            } catch (error) {
-                console.error("Error in renderCommunityGallery:", error);
-            }
+                        <p class="community-caption">${item.caption}</p>
+                    </div>
+                `;
+                communityGrid.appendChild(communityItem);
+            });
+        } catch (error) {
+            console.error("Error in renderCommunityGallery:", error);
         }
+    }
 
-        function handleCommunityUpload() {
-            try {
-                if (!currentUser) {
-                    alert('Please log in to share your creations!');
-                    return;
-                }
-                
-                alert('Community upload feature would open here! In a real implementation, users could upload photos of how they use our stickers.');
-            } catch (error) {
-                console.error("Error in handleCommunityUpload:", error);
+    function handleCommunityUpload() {
+        try {
+            if (!currentUser) {
+                alert('Please log in to share your creations!');
+                return;
             }
+            
+            alert('Community upload feature would open here! In a real implementation, users could upload photos of how they use our stickers.');
+        } catch (error) {
+            console.error("Error in handleCommunityUpload:", error);
         }
-        
-        // RENDER STICKERS
-        function renderStickers() {
-            try {
-                stickerContainer.innerHTML = '';
+    }
+    
+    // RENDER STICKERS
+    function renderStickers() {
+        try {
+            stickerContainer.innerHTML = '';
+            
+            stickers.forEach(sticker => {
+                const stickerCard = document.createElement('div');
+                stickerCard.className = 'sticker-card';
                 
-                stickers.forEach(sticker => {
-                    const stickerCard = document.createElement('div');
-                    stickerCard.className = 'sticker-card';
-                    
-                    const badge = sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : '';
-                    const imageContent = sticker.customImage 
-                        ? `<img src="${sticker.customImage}" alt="${sticker.title}">`
-                        : `<img src="${sticker.image}" alt="${sticker.title}">`;
-                    
-                    const editButton = isUnlocked 
-                        ? `<button class="edit-sticker-btn" data-id="${sticker.id}"><i class="fas fa-edit"></i></button>`
-                        : '';
-                    const deleteButton = isUnlocked 
-                        ? `<button class="delete-sticker-btn" data-id="${sticker.id}"><i class="fas fa-trash"></i></button>`
-                        : '';
-                    
-                    stickerCard.innerHTML = `
-                        ${badge}
-                        ${editButton}
-                        ${deleteButton}
-                        <div class="sticker-img">
-                            ${imageContent}
-                        </div>
-                        <div class="sticker-info">
-                            <h3 class="sticker-title">${sticker.title}</h3>
-                            <p class="sticker-desc">${sticker.description}</p>
-                            <div class="sticker-price">$${sticker.price.toFixed(2)}</div>
-                            <div class="purchase-options">
-                                <div class="quantity-selector">
-                                    <button class="qty-btn minus">-</button>
-                                    <input type="text" class="qty-input" value="1">
-                                    <button class="qty-btn plus">+</button>
-                                </div>
-                                <button class="add-cart-btn" data-id="${sticker.id}">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
+                const badge = sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : '';
+                const imageContent = sticker.customImage 
+                    ? `<img src="${sticker.customImage}" alt="${sticker.title}">`
+                    : `<img src="${sticker.image}" alt="${sticker.title}">`;
+                
+                const editButton = isUnlocked 
+                    ? `<button class="edit-sticker-btn" data-id="${sticker.id}"><i class="fas fa-edit"></i></button>`
+                    : '';
+                const deleteButton = isUnlocked 
+                    ? `<button class="delete-sticker-btn" data-id="${sticker.id}"><i class="fas fa-trash"></i></button>`
+                    : '';
+                
+                stickerCard.innerHTML = `
+                    ${badge}
+                    ${editButton}
+                    ${deleteButton}
+                    <div class="sticker-img">
+                        ${imageContent}
+                    </div>
+                    <div class="sticker-info">
+                        <h3 class="sticker-title">${sticker.title}</h3>
+                        <p class="sticker-desc">${sticker.description}</p>
+                        <div class="sticker-price">$${sticker.price.toFixed(2)}</div>
+                        <div class="purchase-options">
+                            <div class="quantity-selector">
+                                <button class="qty-btn minus">-</button>
+                                <input type="text" class="qty-input" value="1">
+                                <button class="qty-btn plus">+</button>
                             </div>
+                            <button class="add-cart-btn" data-id="${sticker.id}">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
                         </div>
-                    `;
+                    </div>
+                `;
+                
+                stickerContainer.appendChild(stickerCard);
+            });
+            
+            document.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('.qty-input');
+                    let value = parseInt(input.value);
                     
-                    stickerContainer.appendChild(stickerCard);
+                    if (this.classList.contains('plus')) {
+                        value++;
+                    } else if (this.classList.contains('minus') && value > 1) {
+                        value--;
+                    }
+                    
+                    input.value = value;
                 });
-                
-                document.querySelectorAll('.qty-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const input = this.parentElement.querySelector('.qty-input');
-                        let value = parseInt(input.value);
-                        
-                        if (this.classList.contains('plus')) {
-                            value++;
-                        } else if (this.classList.contains('minus') && value > 1) {
-                            value--;
-                        }
-                        
-                        input.value = value;
-                    });
+            });
+            
+            document.querySelectorAll('.add-cart-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    const quantity = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
+                    addToCart(id, quantity);
+                    const sticker = stickers.find(s => s.id === id);
+                    alert(`Added ${quantity} "${sticker.title}" sticker(s) to your cart!`);
+                    this.closest('.purchase-options').querySelector('.qty-input').value = "1";
                 });
-                
-                document.querySelectorAll('.add-cart-btn').forEach(btn => {
+            });
+            
+            if (isUnlocked) {
+                document.querySelectorAll('.edit-sticker-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const id = parseInt(this.getAttribute('data-id'));
-                        const quantity = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
-                        addToCart(id, quantity);
-                        const sticker = stickers.find(s => s.id === id);
-                        alert(`Added ${quantity} "${sticker.title}" sticker(s) to your cart!`);
-                        this.closest('.purchase-options').querySelector('.qty-input').value = "1";
+                        openStickerImageUpload(id);
                     });
                 });
-                
-                if (isUnlocked) {
-                    document.querySelectorAll('.edit-sticker-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = parseInt(this.getAttribute('data-id'));
-                            openStickerImageUpload(id);
-                        });
-                    });
 
-                    document.querySelectorAll('.delete-sticker-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = parseInt(this.getAttribute('data-id'));
-                            deleteSticker(id);
-                        });
+                document.querySelectorAll('.delete-sticker-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteSticker(id);
                     });
-                }
-            } catch (error) {
-                console.error("Error in renderStickers:", error);
+                });
             }
+        } catch (error) {
+            console.error("Error in renderStickers:", error);
         }
+    }
 
-        function deleteSticker(id) {
-            try {
-                const sticker = stickers.find(s => s.id === id);
-                if (!sticker) return;
-                
-                if (confirm(`Are you sure you want to delete "${sticker.title}"? This action cannot be undone.`)) {
-                    stickers = stickers.filter(s => s.id !== id);
-                    cart = cart.filter(item => item.id !== id);
-                    renderStickers();
-                    renderGallery();
-                    updateCart();
-                    alert(`"${sticker.title}" has been deleted successfully!`);
-                }
-            } catch (error) {
-                console.error("Error in deleteSticker:", error);
-                alert("There was an error deleting the sticker. Please try again.");
-            }
-        }
-        
-        function openStickerImageUpload(stickerId) {
-            try {
-                currentStickerId = stickerId;
-                stickerUploadSection.classList.add('active');
-                resetStickerUploadForm();
-                stickerUploadSection.scrollIntoView({ behavior: 'smooth' });
-            } catch (error) {
-                console.error("Error in openStickerImageUpload:", error);
-            }
-        }
-        
-        // RENDER GALLERY
-        function renderGallery() {
-            try {
-                const allGalleryItems = [
-                    ...stickers.filter(s => s.image), 
-                    ...surpriseImages
-                ];
-                
-                galleryContainer.innerHTML = '';
-                galleryDots.innerHTML = '';
-                
-                if (allGalleryItems.length === 0) {
-                    galleryContainer.innerHTML = `
-                        <div class="gallery-item">
-                            <div class="gallery-image" style="background: #e4ddc6; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-images" style="font-size: 4rem; color: #757331;"></i>
-                            </div>
-                            <div class="gallery-caption">
-                                <h3>No gallery items yet</h3>
-                                <p>Add some images in the admin panel</p>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                allGalleryItems.forEach((item, index) => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    galleryItem.innerHTML = `
-                        <img src="${item.image}" alt="${item.caption}" class="gallery-image">
-                        <div class="gallery-caption">
-                            <h3>${item.caption}</h3>
-                            ${item.title ? `<p>Only $${item.price} - ${item.description}</p>` : ''}
-                        </div>
-                    `;
-                    galleryContainer.appendChild(galleryItem);
-                    
-                    const dot = document.createElement('div');
-                    dot.className = `dot ${index === 0 ? 'active' : ''}`;
-                    dot.setAttribute('data-index', index);
-                    dot.addEventListener('click', () => {
-                        goToGallerySlide(index);
-                    });
-                    galleryDots.appendChild(dot);
-                });
-                
-                updateGalleryPosition();
-            } catch (error) {
-                console.error("Error in renderGallery:", error);
-            }
-        }
-        
-        function updateGalleryPosition() {
-            try {
-                galleryContainer.style.transform = `translateX(-${currentGalleryIndex * 100}%)`;
-                
-                document.querySelectorAll('.dot').forEach((dot, index) => {
-                    if (index === currentGalleryIndex) {
-                        dot.classList.add('active');
-                    } else {
-                        dot.classList.remove('active');
-                    }
-                });
-            } catch (error) {
-                console.error("Error in updateGalleryPosition:", error);
-            }
-        }
-        
-        function goToGallerySlide(index) {
-            try {
-                const allGalleryItems = [
-                    ...stickers.filter(s => s.image), 
-                    ...surpriseImages
-                ];
-                
-                if (index >= 0 && index < allGalleryItems.length) {
-                    currentGalleryIndex = index;
-                    updateGalleryPosition();
-                    resetGalleryAutoSlide();
-                }
-            } catch (error) {
-                console.error("Error in goToGallerySlide:", error);
-            }
-        }
-        
-        function nextGallerySlide() {
-            try {
-                const allGalleryItems = [
-                    ...stickers.filter(s => s.image), 
-                    ...surpriseImages
-                ];
-                
-                if (allGalleryItems.length === 0) return;
-                
-                currentGalleryIndex = (currentGalleryIndex + 1) % allGalleryItems.length;
-                updateGalleryPosition();
-            } catch (error) {
-                console.error("Error in nextGallerySlide:", error);
-            }
-        }
-        
-        function prevGallerySlide() {
-            try {
-                const allGalleryItems = [
-                    ...stickers.filter(s => s.image), 
-                    ...surpriseImages
-                ];
-                
-                if (allGalleryItems.length === 0) return;
-                
-                currentGalleryIndex = (currentGalleryIndex - 1 + allGalleryItems.length) % allGalleryItems.length;
-                updateGalleryPosition();
-            } catch (error) {
-                console.error("Error in prevGallerySlide:", error);
-            }
-        }
-        
-        function startGalleryAutoSlide() {
-            try {
-                galleryInterval = setInterval(nextGallerySlide, 5000);
-            } catch (error) {
-                console.error("Error in startGalleryAutoSlide:", error);
-            }
-        }
-        
-        function resetGalleryAutoSlide() {
-            try {
-                clearInterval(galleryInterval);
-                startGalleryAutoSlide();
-            } catch (error) {
-                console.error("Error in resetGalleryAutoSlide:", error);
-            }
-        }
-        
-        // CART FUNCTIONS
-        function addToCart(id, quantity) {
-            try {
-                const sticker = stickers.find(s => s.id === id);
-                const existingItem = cart.find(item => item.id === id);
-                
-                if (existingItem) {
-                    existingItem.quantity += quantity;
-                } else {
-                    cart.push({
-                        id: sticker.id,
-                        title: sticker.title,
-                        price: sticker.price,
-                        quantity: quantity
-                    });
-                }
-                
-                updateCart();
-            } catch (error) {
-                console.error("Error in addToCart:", error);
-                alert("There was an error adding the item to your cart. Please try again.");
-            }
-        }
-        
-        function removeFromCart(id) {
-            try {
+    function deleteSticker(id) {
+        try {
+            const sticker = stickers.find(s => s.id === id);
+            if (!sticker) return;
+            
+            if (confirm(`Are you sure you want to delete "${sticker.title}"? This action cannot be undone.`)) {
+                stickers = stickers.filter(s => s.id !== id);
                 cart = cart.filter(item => item.id !== id);
+                renderStickers();
+                renderGallery();
                 updateCart();
-            } catch (error) {
-                console.error("Error in removeFromCart:", error);
+                alert(`"${sticker.title}" has been deleted successfully!`);
             }
+        } catch (error) {
+            console.error("Error in deleteSticker:", error);
+            alert("There was an error deleting the sticker. Please try again.");
         }
-        
-        function updateCart() {
-            try {
-                cartItems.innerHTML = '';
+    }
+    
+    function openStickerImageUpload(stickerId) {
+        try {
+            currentStickerId = stickerId;
+            stickerUploadSection.classList.add('active');
+            resetStickerUploadForm();
+            stickerUploadSection.scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error("Error in openStickerImageUpload:", error);
+        }
+    }
+    
+    // RENDER GALLERY
+    function renderGallery() {
+        try {
+            const allGalleryItems = [
+                ...stickers.filter(s => s.image), 
+                ...surpriseImages
+            ];
+            
+            galleryContainer.innerHTML = '';
+            galleryDots.innerHTML = '';
+            
+            if (allGalleryItems.length === 0) {
+                galleryContainer.innerHTML = `
+                    <div class="gallery-item">
+                        <div class="gallery-image" style="background: #e4ddc6; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-images" style="font-size: 4rem; color: #757331;"></i>
+                        </div>
+                        <div class="gallery-caption">
+                            <h3>No gallery items yet</h3>
+                            <p>Add some images in the admin panel</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            allGalleryItems.forEach((item, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.caption}" class="gallery-image">
+                    <div class="gallery-caption">
+                        <h3>${item.caption}</h3>
+                        ${item.title ? `<p>Only $${item.price} - ${item.description}</p>` : ''}
+                    </div>
+                `;
+                galleryContainer.appendChild(galleryItem);
                 
-                if (cart.length === 0) {
-                    cartItems.innerHTML = '<div class="cart-item">Your cart is empty</div>';
-                    checkoutBtn.disabled = true;
-                    checkoutBtn.style.opacity = '0.6';
-                    checkoutBtn.style.cursor = 'not-allowed';
-                    cartTotal.textContent = '$0.00';
+                const dot = document.createElement('div');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dot.setAttribute('data-index', index);
+                dot.addEventListener('click', () => {
+                    goToGallerySlide(index);
+                });
+                galleryDots.appendChild(dot);
+            });
+            
+            updateGalleryPosition();
+        } catch (error) {
+            console.error("Error in renderGallery:", error);
+        }
+    }
+    
+    function updateGalleryPosition() {
+        try {
+            galleryContainer.style.transform = `translateX(-${currentGalleryIndex * 100}%)`;
+            
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                if (index === currentGalleryIndex) {
+                    dot.classList.add('active');
                 } else {
-                    let subtotal = 0;
-                    
-                    cart.forEach(item => {
-                        const itemTotal = item.price * item.quantity;
-                        subtotal += itemTotal;
-                        
-                        const cartItem = document.createElement('div');
-                        cartItem.className = 'cart-item';
-                        cartItem.innerHTML = `
-                            <span>${item.title} (${item.quantity}):</span>
-                            <div class="cart-item-actions">
-                                <span>$${itemTotal.toFixed(2)}</span>
-                                <button class="remove-item" data-id="${item.id}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        `;
-                        cartItems.appendChild(cartItem);
-                    });
-                    
-                    const total = subtotal + shippingCost;
-                    cartTotal.textContent = `$${total.toFixed(2)}`;
-                    
-                    checkoutBtn.disabled = false;
-                    checkoutBtn.style.opacity = '1';
-                    checkoutBtn.style.cursor = 'pointer';
-                    
-                    document.querySelectorAll('.remove-item').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const id = parseInt(this.getAttribute('data-id'));
-                            removeFromCart(id);
-                        });
-                    });
+                    dot.classList.remove('active');
                 }
-            } catch (error) {
-                console.error("Error in updateCart:", error);
-            }
+            });
+        } catch (error) {
+            console.error("Error in updateGalleryPosition:", error);
         }
-        
-        function showCheckoutForm() {
-            try {
-                checkoutForm.style.display = 'block';
-                updateCheckoutSummary();
-            } catch (error) {
-                console.error("Error in showCheckoutForm:", error);
+    }
+    
+    function goToGallerySlide(index) {
+        try {
+            const allGalleryItems = [
+                ...stickers.filter(s => s.image), 
+                ...surpriseImages
+            ];
+            
+            if (index >= 0 && index < allGalleryItems.length) {
+                currentGalleryIndex = index;
+                updateGalleryPosition();
+                resetGalleryAutoSlide();
             }
+        } catch (error) {
+            console.error("Error in goToGallerySlide:", error);
         }
-        
-        function hideCheckoutForm() {
-            try {
-                checkoutForm.style.display = 'none';
-            } catch (error) {
-                console.error("Error in hideCheckoutForm:", error);
+    }
+    
+    function nextGallerySlide() {
+        try {
+            const allGalleryItems = [
+                ...stickers.filter(s => s.image), 
+                ...surpriseImages
+            ];
+            
+            if (allGalleryItems.length === 0) return;
+            
+            currentGalleryIndex = (currentGalleryIndex + 1) % allGalleryItems.length;
+            updateGalleryPosition();
+        } catch (error) {
+            console.error("Error in nextGallerySlide:", error);
+        }
+    }
+    
+    function prevGallerySlide() {
+        try {
+            const allGalleryItems = [
+                ...stickers.filter(s => s.image), 
+                ...surpriseImages
+            ];
+            
+            if (allGalleryItems.length === 0) return;
+            
+            currentGalleryIndex = (currentGalleryIndex - 1 + allGalleryItems.length) % allGalleryItems.length;
+            updateGalleryPosition();
+        } catch (error) {
+            console.error("Error in prevGallerySlide:", error);
+        }
+    }
+    
+    function startGalleryAutoSlide() {
+        try {
+            galleryInterval = setInterval(nextGallerySlide, 5000);
+        } catch (error) {
+            console.error("Error in startGalleryAutoSlide:", error);
+        }
+    }
+    
+    function resetGalleryAutoSlide() {
+        try {
+            clearInterval(galleryInterval);
+            startGalleryAutoSlide();
+        } catch (error) {
+            console.error("Error in resetGalleryAutoSlide:", error);
+        }
+    }
+    
+    // CART FUNCTIONS
+    function addToCart(id, quantity) {
+        try {
+            const sticker = stickers.find(s => s.id === id);
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: sticker.id,
+                    title: sticker.title,
+                    price: sticker.price,
+                    quantity: quantity
+                });
             }
+            
+            updateCart();
+        } catch (error) {
+            console.error("Error in addToCart:", error);
+            alert("There was an error adding the item to your cart. Please try again.");
         }
-        
-        function updateCheckoutSummary() {
-            try {
-                checkoutItems.innerHTML = '';
-                
+    }
+    
+    function removeFromCart(id) {
+        try {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        } catch (error) {
+            console.error("Error in removeFromCart:", error);
+        }
+    }
+    
+    function updateCart() {
+        try {
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="cart-item">Your cart is empty</div>';
+                checkoutBtn.disabled = true;
+                checkoutBtn.style.opacity = '0.6';
+                checkoutBtn.style.cursor = 'not-allowed';
+                cartTotal.textContent = '$0.00';
+            } else {
                 let subtotal = 0;
                 
                 cart.forEach(item => {
                     const itemTotal = item.price * item.quantity;
                     subtotal += itemTotal;
                     
-                    const checkoutItem = document.createElement('div');
-                    checkoutItem.className = 'checkout-summary-item';
-                    checkoutItem.innerHTML = `
-                        <span>${item.title} (${item.quantity})</span>
-                        <span>$${itemTotal.toFixed(2)}</span>
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <span>${item.title} (${item.quantity}):</span>
+                        <div class="cart-item-actions">
+                            <span>$${itemTotal.toFixed(2)}</span>
+                            <button class="remove-item" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     `;
-                    checkoutItems.appendChild(checkoutItem);
+                    cartItems.appendChild(cartItem);
                 });
                 
                 const total = subtotal + shippingCost;
-                checkoutShipping.textContent = `$${shippingCost.toFixed(2)}`;
-                checkoutTotal.textContent = `$${total.toFixed(2)}`;
-            } catch (error) {
-                console.error("Error in updateCheckoutSummary:", error);
+                cartTotal.textContent = `$${total.toFixed(2)}`;
+                
+                checkoutBtn.disabled = false;
+                checkoutBtn.style.opacity = '1';
+                checkoutBtn.style.cursor = 'pointer';
+                
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        removeFromCart(id);
+                    });
+                });
             }
+        } catch (error) {
+            console.error("Error in updateCart:", error);
         }
+    }
+    
+    function showCheckoutForm() {
+        try {
+            checkoutForm.style.display = 'block';
+            updateCheckoutSummary();
+        } catch (error) {
+            console.error("Error in showCheckoutForm:", error);
+        }
+    }
+    
+    function hideCheckoutForm() {
+        try {
+            checkoutForm.style.display = 'none';
+        } catch (error) {
+            console.error("Error in hideCheckoutForm:", error);
+        }
+    }
+    
+    function updateCheckoutSummary() {
+        try {
+            checkoutItems.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const checkoutItem = document.createElement('div');
+                checkoutItem.className = 'checkout-summary-item';
+                checkoutItem.innerHTML = `
+                    <span>${item.title} (${item.quantity})</span>
+                    <span>$${itemTotal.toFixed(2)}</span>
+                `;
+                checkoutItems.appendChild(checkoutItem);
+            });
+            
+            const total = subtotal + shippingCost;
+            checkoutShipping.textContent = `$${shippingCost.toFixed(2)}`;
+            checkoutTotal.textContent = `$${total.toFixed(2)}`;
+        } catch (error) {
+            console.error("Error in updateCheckoutSummary:", error);
+        }
+    }
+    
+    function processCheckout(formData) {
+        try {
+            const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
+            const order = {
+                id: orderId,
+                date: new Date().toISOString(),
+                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'processing',
+                items: [...cart],
+                customer: formData,
+                total: checkoutTotal.textContent,
+                shippingAddress: formData.address,
+                transactionId: formData.transactionId,
+                paymentMethod: currentPaymentMethod
+            };
+            
+            orders.push(order);
+            localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
+            
+            if (currentUser) {
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    users[userIndex].orders.push(orderId);
+                    localStorage.setItem('stickerShopUsers', JSON.stringify(users));
+                    currentUser.orders.push(orderId);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+            }
+            
+            cart = [];
+            updateCart();
+            hideCheckoutForm();
+            
+            alert(`Thank you for your order, ${formData.firstName}! Your order #${orderId} has been placed. Total: ${order.total}\n\nYou can track your order using the Track Order feature.`);
+        } catch (error) {
+            console.error("Error in processCheckout:", error);
+            alert("There was an error processing your order. Please try again.");
+        }
+    }
+    
+    // IMAGE UPLOAD FUNCTIONALITY
+    if (uploadArea && imageUpload) {
+        uploadArea.addEventListener('click', () => {
+            imageUpload.click();
+        });
         
-        function processCheckout(formData) {
-            try {
-                const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
-                const order = {
-                    id: orderId,
-                    date: new Date().toISOString(),
-                    estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    status: 'processing',
-                    items: [...cart],
-                    customer: formData,
-                    total: checkoutTotal.textContent,
-                    shippingAddress: formData.address,
-                    transactionId: formData.transactionId,
-                    paymentMethod: currentPaymentMethod
+        imageUpload.addEventListener('change', handleImageUpload);
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = 'rgba(117, 115, 49, 0.2)';
+            uploadArea.style.borderColor = '#8a8840';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
+            uploadArea.style.borderColor = '#757331';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
+            uploadArea.style.borderColor = '#757331';
+            
+            if (e.dataTransfer.files.length) {
+                imageUpload.files = e.dataTransfer.files;
+                handleImageUpload();
+            }
+        });
+    }
+    
+    function handleImageUpload() {
+        try {
+            const file = imageUpload.files[0];
+            
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size exceeds 5MB limit. Please choose a smaller image.');
+                    return;
+                }
+                
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, PNG, or GIF).');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    uploadPreview.src = e.target.result;
+                    uploadPreview.style.display = 'block';
+                    uploadActions.style.display = 'flex';
+                    imageCaption.value = '';
+                    uploadSuccess.style.display = 'none';
                 };
                 
-                orders.push(order);
-                localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
-                
-                if (currentUser) {
-                    const userIndex = users.findIndex(u => u.id === currentUser.id);
-                    if (userIndex !== -1) {
-                        users[userIndex].orders.push(orderId);
-                        localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                        currentUser.orders.push(orderId);
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    }
-                }
-                
-                cart = [];
-                updateCart();
-                hideCheckoutForm();
-                
-                alert(`Thank you for your order, ${formData.firstName}! Your order #${orderId} has been placed. Total: ${order.total}\n\nYou can track your order using the Track Order feature.`);
-            } catch (error) {
-                console.error("Error in processCheckout:", error);
-                alert("There was an error processing your order. Please try again.");
+                reader.readAsDataURL(file);
             }
+        } catch (error) {
+            console.error("Error in handleImageUpload:", error);
+            alert("There was an error uploading the image. Please try again.");
         }
-        
-        // IMAGE UPLOAD FUNCTIONALITY
-        if (uploadArea && imageUpload) {
-            uploadArea.addEventListener('click', () => {
-                imageUpload.click();
-            });
-            
-            imageUpload.addEventListener('change', handleImageUpload);
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.background = 'rgba(117, 115, 49, 0.2)';
-                uploadArea.style.borderColor = '#8a8840';
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
-                uploadArea.style.borderColor = '#757331';
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
-                uploadArea.style.borderColor = '#757331';
-                
-                if (e.dataTransfer.files.length) {
-                    imageUpload.files = e.dataTransfer.files;
-                    handleImageUpload();
-                }
-            });
-        }
-        
-        function handleImageUpload() {
+    }
+    
+    if (confirmUpload) {
+        confirmUpload.addEventListener('click', () => {
             try {
-                const file = imageUpload.files[0];
-                
-                if (file) {
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('File size exceeds 5MB limit. Please choose a smaller image.');
-                        return;
-                    }
-                    
-                    if (!file.type.match('image.*')) {
-                        alert('Please select an image file (JPG, PNG, or GIF).');
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        uploadPreview.src = e.target.result;
-                        uploadPreview.style.display = 'block';
-                        uploadActions.style.display = 'flex';
-                        imageCaption.value = '';
-                        uploadSuccess.style.display = 'none';
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
+                const caption = imageCaption.value || "Uploaded Image";
+                addToGallery(uploadPreview.src, caption);
+                saveGalleryImagesToStorage(); // ← SAVE GALLERY IMAGES
+                uploadSuccess.style.display = 'block';
+                setTimeout(() => {
+                    resetUploadForm();
+                }, 2000);
             } catch (error) {
-                console.error("Error in handleImageUpload:", error);
-                alert("There was an error uploading the image. Please try again.");
+                console.error("Error in confirmUpload:", error);
+                alert("There was an error adding the image to the gallery. Please try again.");
             }
+        });
+    }
+    
+    if (cancelUpload) {
+        cancelUpload.addEventListener('click', resetUploadForm);
+    }
+    
+    function resetUploadForm() {
+        try {
+            imageUpload.value = '';
+            uploadPreview.style.display = 'none';
+            uploadActions.style.display = 'none';
+            imageCaption.value = '';
+            uploadSuccess.style.display = 'none';
+        } catch (error) {
+            console.error("Error in resetUploadForm:", error);
         }
+    }
+    
+    function addToGallery(imageSrc, caption) {
+        try {
+            const newGalleryItem = {
+                image: imageSrc,
+                caption: caption
+            };
+            
+            surpriseImages.push(newGalleryItem);
+            renderGallery();
+        } catch (error) {
+            console.error("Error in addToGallery:", error);
+        }
+    }
+    
+    // STICKER IMAGE UPLOAD
+    if (stickerUploadArea && stickerImageUpload) {
+        stickerUploadArea.addEventListener('click', () => {
+            stickerImageUpload.click();
+        });
         
-        if (confirmUpload) {
-            confirmUpload.addEventListener('click', () => {
-                try {
-                    const caption = imageCaption.value || "Uploaded Image";
-                    addToGallery(uploadPreview.src, caption);
-                    uploadSuccess.style.display = 'block';
-                    setTimeout(() => {
-                        resetUploadForm();
-                    }, 2000);
-                } catch (error) {
-                    console.error("Error in confirmUpload:", error);
-                    alert("There was an error adding the image to the gallery. Please try again.");
+        stickerImageUpload.addEventListener('change', handleStickerImageUpload);
+        
+        stickerUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            stickerUploadArea.style.background = 'rgba(117, 115, 49, 0.2)';
+            stickerUploadArea.style.borderColor = '#8a8840';
+        });
+        
+        stickerUploadArea.addEventListener('dragleave', () => {
+            stickerUploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
+            stickerUploadArea.style.borderColor = '#757331';
+        });
+        
+        stickerUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            stickerUploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
+            stickerUploadArea.style.borderColor = '#757331';
+            
+            if (e.dataTransfer.files.length) {
+                stickerImageUpload.files = e.dataTransfer.files;
+                handleStickerImageUpload();
+            }
+        });
+    }
+    
+    function handleStickerImageUpload() {
+        try {
+            const file = stickerImageUpload.files[0];
+            
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size exceeds 5MB limit. Please choose a smaller image.');
+                    return;
                 }
-            });
-        }
-        
-        if (cancelUpload) {
-            cancelUpload.addEventListener('click', resetUploadForm);
-        }
-        
-        function resetUploadForm() {
-            try {
-                imageUpload.value = '';
-                uploadPreview.style.display = 'none';
-                uploadActions.style.display = 'none';
-                imageCaption.value = '';
-                uploadSuccess.style.display = 'none';
-            } catch (error) {
-                console.error("Error in resetUploadForm:", error);
-            }
-        }
-        
-        function addToGallery(imageSrc, caption) {
-            try {
-                const newGalleryItem = {
-                    image: imageSrc,
-                    caption: caption
+                
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, PNG, or GIF).');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    stickerUploadPreview.src = e.target.result;
+                    stickerUploadPreview.style.display = 'block';
+                    stickerUploadActions.style.display = 'flex';
+                    stickerUploadSuccess.style.display = 'none';
                 };
                 
-                surpriseImages.push(newGalleryItem);
+                reader.readAsDataURL(file);
+            }
+        } catch (error) {
+            console.error("Error in handleStickerImageUpload:", error);
+            alert("There was an error uploading the sticker image. Please try again.");
+        }
+    }
+    
+    if (stickerConfirmUpload) {
+        stickerConfirmUpload.addEventListener('click', () => {
+            try {
+                if (!stickerUploadPreview.src || stickerUploadPreview.style.display === 'none') {
+                    alert('Please select an image first!');
+                    return;
+                }
+                
+                if (!currentStickerId) {
+                    let updatedCount = 0;
+                    stickers.forEach(sticker => {
+                        if (!sticker.customImage) {
+                            sticker.customImage = stickerUploadPreview.src;
+                            updatedCount++;
+                        }
+                    });
+                    
+                    if (updatedCount > 0) {
+                        renderStickers();
+                        saveImagesToStorage(); // ← SAVE TO STORAGE
+                        stickerUploadSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Image applied to ${updatedCount} sticker(s)!`;
+                        stickerUploadSuccess.style.display = 'block';
+                        setTimeout(() => {
+                            resetStickerUploadForm();
+                            stickerUploadSection.classList.remove('active');
+                        }, 3000);
+                    } else {
+                        alert('All stickers already have custom images!');
+                    }
+                } else {
+                    const stickerIndex = stickers.findIndex(s => s.id === currentStickerId);
+                    if (stickerIndex !== -1) {
+                        stickers[stickerIndex].customImage = stickerUploadPreview.src;
+                        renderStickers();
+                        saveImagesToStorage(); // ← SAVE TO STORAGE
+                        const stickerName = stickers[stickerIndex].title;
+                        stickerUploadSuccess.innerHTML = `<i class="fas fa-check-circle"></i> "${stickerName}" image successfully updated!`;
+                        stickerUploadSuccess.style.display = 'block';
+                        setTimeout(() => {
+                            resetStickerUploadForm();
+                            stickerUploadSection.classList.remove('active');
+                        }, 3000);
+                    }
+                }
+            } catch (error) {
+                console.error("Error in stickerConfirmUpload:", error);
+                alert("There was an error updating the sticker image. Please try again.");
+            }
+        });
+    }
+    
+    if (stickerCancelUpload) {
+        stickerCancelUpload.addEventListener('click', resetStickerUploadForm);
+    }
+    
+    function resetStickerUploadForm() {
+        try {
+            stickerImageUpload.value = '';
+            stickerUploadPreview.style.display = 'none';
+            stickerUploadActions.style.display = 'none';
+            stickerUploadSuccess.style.display = 'none';
+            currentStickerId = null;
+        } catch (error) {
+            console.error("Error in resetStickerUploadForm:", error);
+        }
+    }
+    
+    // DEVELOPER TOOLS FUNCTIONS
+    function toggleUploadSection() {
+        try {
+            if (!isUnlocked) {
+                alert("Please unlock access first!");
+                return;
+            }
+            uploadSection.classList.toggle('active');
+        } catch (error) {
+            console.error("Error in toggleUploadSection:", error);
+        }
+    }
+    
+    function toggleStickerUploadSection() {
+        try {
+            if (!isUnlocked) {
+                alert("Please unlock access first!");
+                return;
+            }
+            
+            currentStickerId = null;
+            stickerUploadSection.classList.toggle('active');
+            
+            if (stickerUploadSection.classList.contains('active')) {
+                resetStickerUploadForm();
+                stickerUploadSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (error) {
+            console.error("Error in toggleStickerUploadSection:", error);
+        }
+    }
+    
+    function clearGallery() {
+        try {
+            if (!isUnlocked) {
+                alert("Please unlock access first!");
+                return;
+            }
+            
+            if (confirm('Are you sure you want to clear all uploaded images from the gallery?')) {
+                surpriseImages = [];
                 renderGallery();
-            } catch (error) {
-                console.error("Error in addToGallery:", error);
+                alert('Gallery cleared successfully!');
             }
+        } catch (error) {
+            console.error("Error in clearGallery:", error);
+            alert("There was an error clearing the gallery. Please try again.");
+        }
+    }
+    
+    function addSampleImages() {
+        try {
+            if (!isUnlocked) {
+                alert("Please unlock access first!");
+                return;
+            }
+            
+            const sampleImages = [
+                {
+                    image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?w=800",
+                    caption: "Traditional Afghan Pattern"
+                },
+                {
+                    image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800",
+                    caption: "Cultural Heritage Design"
+                }
+            ];
+            
+            surpriseImages.push(...sampleImages);
+            renderGallery();
+            alert('Sample images added to gallery!');
+        } catch (error) {
+            console.error("Error in addSampleImages:", error);
+            alert("There was an error adding sample images. Please try again.");
+        }
+    }
+    
+    function exportData() {
+        try {
+            if (!isUnlocked) {
+                alert("Please unlock access first!");
+                return;
+            }
+            
+            const data = {
+                stickers: stickers,
+                galleryImages: surpriseImages,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'afghan-sticker-data.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('Data exported successfully!');
+        } catch (error) {
+            console.error("Error in exportData:", error);
+            alert("There was an error exporting data. Please try again.");
+        }
+    }
+    
+    // SETUP EVENT LISTENERS
+    function setupEventListeners() {
+        if (scrollDownBtn) {
+            scrollDownBtn.addEventListener('click', function() {
+                document.querySelector('#products').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
         }
         
-        // STICKER IMAGE UPLOAD
-        if (stickerUploadArea && stickerImageUpload) {
-            stickerUploadArea.addEventListener('click', () => {
-                stickerImageUpload.click();
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                if (cart.length === 0) {
+                    alert('Your cart is empty. Please add some stickers first.');
+                } else {
+                    showCheckoutForm();
+                }
             });
-            
-            stickerImageUpload.addEventListener('change', handleStickerImageUpload);
-            
-            stickerUploadArea.addEventListener('dragover', (e) => {
+        }
+        
+        if (checkoutCancelBtn) {
+            checkoutCancelBtn.addEventListener('click', hideCheckoutForm);
+        }
+        
+        if (checkoutDetailsForm) {
+            checkoutDetailsForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                stickerUploadArea.style.background = 'rgba(117, 115, 49, 0.2)';
-                stickerUploadArea.style.borderColor = '#8a8840';
-            });
-            
-            stickerUploadArea.addEventListener('dragleave', () => {
-                stickerUploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
-                stickerUploadArea.style.borderColor = '#757331';
-            });
-            
-            stickerUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                stickerUploadArea.style.background = 'rgba(117, 115, 49, 0.1)';
-                stickerUploadArea.style.borderColor = '#757331';
                 
-                if (e.dataTransfer.files.length) {
-                    stickerImageUpload.files = e.dataTransfer.files;
-                    handleStickerImageUpload();
-                }
-            });
-        }
-        
-        function handleStickerImageUpload() {
-            try {
-                const file = stickerImageUpload.files[0];
+                if (isProcessingPayment) return;
                 
-                if (file) {
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('File size exceeds 5MB limit. Please choose a smaller image.');
-                        return;
-                    }
-                    
-                    if (!file.type.match('image.*')) {
-                        alert('Please select an image file (JPG, PNG, or GIF).');
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        stickerUploadPreview.src = e.target.result;
-                        stickerUploadPreview.style.display = 'block';
-                        stickerUploadActions.style.display = 'flex';
-                        stickerUploadSuccess.style.display = 'none';
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            } catch (error) {
-                console.error("Error in handleStickerImageUpload:", error);
-                alert("There was an error uploading the sticker image. Please try again.");
-            }
-        }
-        
-        if (stickerConfirmUpload) {
-            stickerConfirmUpload.addEventListener('click', () => {
-                try {
-                    if (!stickerUploadPreview.src || stickerUploadPreview.style.display === 'none') {
-                        alert('Please select an image first!');
-                        return;
-                    }
-                    
-                    if (!currentStickerId) {
-                        let updatedCount = 0;
-                        stickers.forEach(sticker => {
-                            if (!sticker.customImage) {
-                                sticker.customImage = stickerUploadPreview.src;
-                                updatedCount++;
-                            }
-                        });
-                        
-                        if (updatedCount > 0) {
-                            renderStickers();
-                            stickerUploadSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Image applied to ${updatedCount} sticker(s)!`;
-                            stickerUploadSuccess.style.display = 'block';
-                            setTimeout(() => {
-                                resetStickerUploadForm();
-                                stickerUploadSection.classList.remove('active');
-                            }, 3000);
-                        } else {
-                            alert('All stickers already have custom images!');
-                        }
-                    } else {
-                        const stickerIndex = stickers.findIndex(s => s.id === currentStickerId);
-                        if (stickerIndex !== -1) {
-                            stickers[stickerIndex].customImage = stickerUploadPreview.src;
-                            renderStickers();
-                            const stickerName = stickers[stickerIndex].title;
-                            stickerUploadSuccess.innerHTML = `<i class="fas fa-check-circle"></i> "${stickerName}" image successfully updated!`;
-                            stickerUploadSuccess.style.display = 'block';
-                            setTimeout(() => {
-                                resetStickerUploadForm();
-                                stickerUploadSection.classList.remove('active');
-                            }, 3000);
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error in stickerConfirmUpload:", error);
-                    alert("There was an error updating the sticker image. Please try again.");
-                }
-            });
-        }
-        
-        if (stickerCancelUpload) {
-            stickerCancelUpload.addEventListener('click', resetStickerUploadForm);
-        }
-        
-        function resetStickerUploadForm() {
-            try {
-                stickerImageUpload.value = '';
-                stickerUploadPreview.style.display = 'none';
-                stickerUploadActions.style.display = 'none';
-                stickerUploadSuccess.style.display = 'none';
-                currentStickerId = null;
-            } catch (error) {
-                console.error("Error in resetStickerUploadForm:", error);
-            }
-        }
-        
-        // DEVELOPER TOOLS FUNCTIONS
-        function toggleUploadSection() {
-            try {
-                if (!isUnlocked) {
-                    alert("Please unlock access first!");
-                    return;
-                }
-                uploadSection.classList.toggle('active');
-            } catch (error) {
-                console.error("Error in toggleUploadSection:", error);
-            }
-        }
-        
-        function toggleStickerUploadSection() {
-            try {
-                if (!isUnlocked) {
-                    alert("Please unlock access first!");
+                if (!validatePaymentForm()) {
                     return;
                 }
                 
-                currentStickerId = null;
-                stickerUploadSection.classList.toggle('active');
-                
-                if (stickerUploadSection.classList.contains('active')) {
-                    resetStickerUploadForm();
-                    stickerUploadSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (error) {
-                console.error("Error in toggleStickerUploadSection:", error);
-            }
-        }
-        
-        function clearGallery() {
-            try {
-                if (!isUnlocked) {
-                    alert("Please unlock access first!");
-                    return;
-                }
-                
-                if (confirm('Are you sure you want to clear all uploaded images from the gallery?')) {
-                    surpriseImages = [];
-                    renderGallery();
-                    alert('Gallery cleared successfully!');
-                }
-            } catch (error) {
-                console.error("Error in clearGallery:", error);
-                alert("There was an error clearing the gallery. Please try again.");
-            }
-        }
-        
-        function addSampleImages() {
-            try {
-                if (!isUnlocked) {
-                    alert("Please unlock access first!");
-                    return;
-                }
-                
-                const sampleImages = [
-                    {
-                        image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?w=800",
-                        caption: "Traditional Afghan Pattern"
-                    },
-                    {
-                        image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800",
-                        caption: "Cultural Heritage Design"
-                    }
-                ];
-                
-                surpriseImages.push(...sampleImages);
-                renderGallery();
-                alert('Sample images added to gallery!');
-            } catch (error) {
-                console.error("Error in addSampleImages:", error);
-                alert("There was an error adding sample images. Please try again.");
-            }
-        }
-        
-        function exportData() {
-            try {
-                if (!isUnlocked) {
-                    alert("Please unlock access first!");
-                    return;
-                }
-                
-                const data = {
-                    stickers: stickers,
-                    galleryImages: surpriseImages,
-                    exportDate: new Date().toISOString()
+                const formData = {
+                    firstName: document.getElementById('first-name').value,
+                    lastName: document.getElementById('last-name').value,
+                    email: document.getElementById('email').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    zip: document.getElementById('zip').value,
+                    country: document.getElementById('country').value,
+                    paymentMethod: currentPaymentMethod,
+                    total: checkoutTotal.textContent
                 };
                 
-                const dataStr = JSON.stringify(data, null, 2);
-                const dataBlob = new Blob([dataStr], {type: 'application/json'});
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'afghan-sticker-data.json';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                if (currentPaymentMethod === 'card') {
+                    formData.cardNumber = cardNumberInput.value.replace(/\s+/g, '');
+                    formData.expiryDate = expiryDateInput.value;
+                    formData.cvv = cvvInput.value;
+                    formData.cardName = cardNameInput.value;
+                }
                 
-                alert('Data exported successfully!');
-            } catch (error) {
-                console.error("Error in exportData:", error);
-                alert("There was an error exporting data. Please try again.");
-            }
+                showPaymentProcessing();
+                
+                try {
+                    const paymentResult = await processPayment(formData);
+                    
+                    if (paymentResult.success) {
+                        showPaymentSuccess(paymentResult.transactionId);
+                        
+                        const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
+                        const order = {
+                            id: orderId,
+                            date: new Date().toISOString(),
+                            estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                            status: 'processing',
+                            items: [...cart],
+                            customer: formData,
+                            total: checkoutTotal.textContent,
+                            shippingAddress: formData.address,
+                            transactionId: paymentResult.transactionId,
+                            paymentMethod: currentPaymentMethod
+                        };
+                        
+                        orders.push(order);
+                        localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
+                        
+                        if (currentUser) {
+                            const userIndex = users.findIndex(u => u.id === currentUser.id);
+                            if (userIndex !== -1) {
+                                users[userIndex].orders.push(orderId);
+                                localStorage.setItem('stickerShopUsers', JSON.stringify(users));
+                                currentUser.orders.push(orderId);
+                                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            }
+                        }
+                    } else {
+                        showPaymentError(paymentResult.error);
+                    }
+                } catch (error) {
+                    showPaymentError(error.error || 'An unexpected error occurred. Please try again.');
+                }
+            });
         }
         
-        // SETUP EVENT LISTENERS
-        function setupEventListeners() {
-            if (scrollDownBtn) {
-                scrollDownBtn.addEventListener('click', function() {
-                    document.querySelector('#products').scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            }
-            
-            if (checkoutBtn) {
-                checkoutBtn.addEventListener('click', function() {
-                    if (cart.length === 0) {
-                        alert('Your cart is empty. Please add some stickers first.');
-                    } else {
-                        showCheckoutForm();
-                    }
-                });
-            }
-            
-            if (checkoutCancelBtn) {
-                checkoutCancelBtn.addEventListener('click', hideCheckoutForm);
-            }
-            
-            if (checkoutDetailsForm) {
-                checkoutDetailsForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    if (isProcessingPayment) return;
-                    
-                    if (!validatePaymentForm()) {
-                        return;
-                    }
-                    
-                    const formData = {
-                        firstName: document.getElementById('first-name').value,
-                        lastName: document.getElementById('last-name').value,
-                        email: document.getElementById('email').value,
-                        address: document.getElementById('address').value,
-                        city: document.getElementById('city').value,
-                        zip: document.getElementById('zip').value,
-                        country: document.getElementById('country').value,
-                        paymentMethod: currentPaymentMethod,
-                        total: checkoutTotal.textContent
-                    };
-                    
-                    if (currentPaymentMethod === 'card') {
-                        formData.cardNumber = cardNumberInput.value.replace(/\s+/g, '');
-                        formData.expiryDate = expiryDateInput.value;
-                        formData.cvv = cvvInput.value;
-                        formData.cardName = cardNameInput.value;
-                    }
-                    
-                    showPaymentProcessing();
-                    
-                    try {
-                        const paymentResult = await processPayment(formData);
-                        
-                        if (paymentResult.success) {
-                            showPaymentSuccess(paymentResult.transactionId);
-                            
-                            const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
-                            const order = {
-                                id: orderId,
-                                date: new Date().toISOString(),
-                                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                                status: 'processing',
-                                items: [...cart],
-                                customer: formData,
-                                total: checkoutTotal.textContent,
-                                shippingAddress: formData.address,
-                                transactionId: paymentResult.transactionId,
-                                paymentMethod: currentPaymentMethod
-                            };
-                            
-                            orders.push(order);
-                            localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
-                            
-                            if (currentUser) {
-                                const userIndex = users.findIndex(u => u.id === currentUser.id);
-                                if (userIndex !== -1) {
-                                    users[userIndex].orders.push(orderId);
-                                    localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                                    currentUser.orders.push(orderId);
-                                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                                }
-                            }
-                        } else {
-                            showPaymentError(paymentResult.error);
-                        }
-                    } catch (error) {
-                        showPaymentError(error.error || 'An unexpected error occurred. Please try again.');
-                    }
-                });
-            }
-            
-            if (addStickerForm) {
-                addStickerForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    if (!isUnlocked) {
-                        alert("Please unlock access first!");
-                        return;
-                    }
-                    
-                    const title = document.getElementById('sticker-title').value;
-                    const price = parseFloat(document.getElementById('sticker-price').value);
-                    const icon = document.getElementById('sticker-icon').value;
-                    const description = document.getElementById('sticker-desc').value;
-                    const color = document.getElementById('sticker-color').value;
-                    const image = document.getElementById('sticker-image').value;
-                    const caption = document.getElementById('sticker-image-caption').value;
-                    const limitedEdition = document.getElementById('sticker-limited').value === 'yes';
-                    
-                    const id = stickers.length > 0 ? Math.max(...stickers.map(s => s.id)) + 1 : 1;
-                    
-                    stickers.push({
-                        id,
-                        title,
-                        price,
-                        icon,
-                        description,
-                        color,
-                        image: image || null,
-                        caption: caption || title,
-                        limitedEdition,
-                        customImage: null
-                    });
-                    
-                    renderStickers();
-                    renderGallery();
-                    addStickerForm.reset();
-                    
-                    alert(`"${title}" has been added to your store!`);
-                });
-            }
-            
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tab = this.getAttribute('data-tab');
-                    
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    document.getElementById(`${tab}-tab`).classList.add('active');
-                    
-                    if (tab === 'admin' && isUnlocked) {
-                        adminPanel.classList.add('active');
-                    } else {
-                        adminPanel.classList.remove('active');
-                    }
-                });
-            });
-            
-            if (prevBtn) prevBtn.addEventListener('click', prevGallerySlide);
-            if (nextBtn) nextBtn.addEventListener('click', nextGallerySlide);
-            
-            if (galleryContainer) {
-                galleryContainer.addEventListener('mouseenter', () => {
-                    clearInterval(galleryInterval);
+        if (addStickerForm) {
+            addStickerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!isUnlocked) {
+                    alert("Please unlock access first!");
+                    return;
+                }
+                
+                const title = document.getElementById('sticker-title').value;
+                const price = parseFloat(document.getElementById('sticker-price').value);
+                const icon = document.getElementById('sticker-icon').value;
+                const description = document.getElementById('sticker-desc').value;
+                const color = document.getElementById('sticker-color').value;
+                const image = document.getElementById('sticker-image').value;
+                const caption = document.getElementById('sticker-image-caption').value;
+                const limitedEdition = document.getElementById('sticker-limited').value === 'yes';
+                
+                const id = stickers.length > 0 ? Math.max(...stickers.map(s => s.id)) + 1 : 1;
+                
+                stickers.push({
+                    id,
+                    title,
+                    price,
+                    icon,
+                    description,
+                    color,
+                    image: image || null,
+                    caption: caption || title,
+                    limitedEdition,
+                    customImage: null
                 });
                 
-                galleryContainer.addEventListener('mouseleave', () => {
-                    startGalleryAutoSlide();
-                });
-            }
+                renderStickers();
+                renderGallery();
+                addStickerForm.reset();
+                
+                alert(`"${title}" has been added to your store!`);
+            });
+        }
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tab}-tab`).classList.add('active');
+                
+                if (tab === 'admin' && isUnlocked) {
+                    adminPanel.classList.add('active');
+                } else {
+                    adminPanel.classList.remove('active');
+                }
+            });
+        });
+        
+        if (prevBtn) prevBtn.addEventListener('click', prevGallerySlide);
+        if (nextBtn) nextBtn.addEventListener('click', nextGallerySlide);
+        
+        if (galleryContainer) {
+            galleryContainer.addEventListener('mouseenter', () => {
+                clearInterval(galleryInterval);
+            });
             
-            const exploreBtn = document.querySelector('.btn');
-            if (exploreBtn) {
-                exploreBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.querySelector('#products').scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            }
-            
-            if (toggleUploadBtn) toggleUploadBtn.addEventListener('click', toggleUploadSection);
-            if (toggleStickerUploadBtn) toggleStickerUploadBtn.addEventListener('click', toggleStickerUploadSection);
-            if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
-            if (addSampleImagesBtn) addSampleImagesBtn.addEventListener('click', addSampleImages);
-            if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
-            
-            // User Authentication Event Listeners
-            if (authBtn) {
-                authBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    authModal.classList.toggle('active');
-                    userMenu.classList.remove('active');
-                });
-            }
-
-            if (userProfile) {
-                userProfile.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    userMenu.classList.toggle('active');
-                    authModal.classList.remove('active');
-                });
-            }
-
-            authTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabName = this.getAttribute('data-tab');
-                    
-                    authTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    authForms.forEach(form => form.classList.remove('active'));
-                    document.getElementById(`${tabName}-form`).classList.add('active');
+            galleryContainer.addEventListener('mouseleave', () => {
+                startGalleryAutoSlide();
+            });
+        }
+        
+        const exploreBtn = document.querySelector('.btn');
+        if (exploreBtn) {
+            exploreBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('#products').scrollIntoView({
+                    behavior: 'smooth'
                 });
             });
-
-            if (loginSubmit) {
-                loginSubmit.addEventListener('click', function() {
-                    const email = document.getElementById('login-email').value;
-                    const password = document.getElementById('login-password').value;
-                    
-                    if (email && password) {
-                        loginUser(email, password);
-                    } else {
-                        alert('Please fill in all fields!');
-                    }
-                });
-            }
-
-            if (signupSubmit) {
-                signupSubmit.addEventListener('click', function() {
-                    const name = document.getElementById('signup-name').value;
-                    const email = document.getElementById('signup-email').value;
-                    const password = document.getElementById('signup-password').value;
-                    const confirm = document.getElementById('signup-confirm').value;
-                    
-                    if (name && email && password && confirm) {
-                        if (password !== confirm) {
-                            alert('Passwords do not match!');
-                            return;
-                        }
-                        if (password.length < 6) {
-                            alert('Password must be at least 6 characters long!');
-                            return;
-                        }
-                        signupUser(name, email, password);
-                    } else {
-                        alert('Please fill in all fields!');
-                    }
-                });
-            }
-
-            if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
-            if (profileBtn) profileBtn.addEventListener('click', showProfileSection);
-
-            if (saveProfile) saveProfile.addEventListener('click', saveUserProfile);
-            if (cancelProfile) {
-                cancelProfile.addEventListener('click', function() {
-                    profileSection.classList.remove('active');
-                });
-            }
-
-            if (avatarUploadBtn) {
-                avatarUploadBtn.addEventListener('click', function() {
-                    avatarUpload.click();
-                });
-            }
-            if (avatarUpload) avatarUpload.addEventListener('change', handleAvatarUpload);
-
-            if (trackOrderBtn) trackOrderBtn.addEventListener('click', showTrackOrderSection);
-
-            if (trackOrderSubmit) {
-                trackOrderSubmit.addEventListener('click', function() {
-                    const orderId = orderIdInput.value.trim();
-                    if (orderId) {
-                        trackOrder(orderId);
-                    } else {
-                        alert('Please enter an order ID!');
-                    }
-                });
-            }
-
-            if (orderHistoryBtn) orderHistoryBtn.addEventListener('click', showOrderHistory);
-
-            subscribeBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const plan = this.getAttribute('data-plan');
-                    handleSubscription(plan);
-                });
-            });
-
-            if (uploadCommunityBtn) uploadCommunityBtn.addEventListener('click', handleCommunityUpload);
-
-            footerLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = this.getAttribute('href');
-                    if (target && target.startsWith('#')) {
-                        const element = document.querySelector(target);
-                        if (element) {
-                            element.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    } else {
-                        alert(`This would navigate to: ${target}`);
-                    }
-                });
-            });
-
-            socialLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const platform = this.getAttribute('title');
-                    alert(`This would open our ${platform} page in a new tab!`);
-                });
-            });
-
-            document.addEventListener('click', function() {
-                authModal.classList.remove('active');
+        }
+        
+        if (toggleUploadBtn) toggleUploadBtn.addEventListener('click', toggleUploadSection);
+        if (toggleStickerUploadBtn) toggleStickerUploadBtn.addEventListener('click', toggleStickerUploadSection);
+        if (clearGalleryBtn) clearGalleryBtn.addEventListener('click', clearGallery);
+        if (addSampleImagesBtn) addSampleImagesBtn.addEventListener('click', addSampleImages);
+        if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
+        
+        // User Authentication Event Listeners
+        if (authBtn) {
+            authBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                authModal.classList.toggle('active');
                 userMenu.classList.remove('active');
             });
+        }
 
-            if (authModal) {
-                authModal.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
+        if (userProfile) {
+            userProfile.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle('active');
+                authModal.classList.remove('active');
+            });
+        }
 
-            if (userMenu) {
-                userMenu.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-            
-            if (adminTabBtn) {
-                adminTabBtn.disabled = true;
-                adminTabBtn.style.opacity = "0.5";
-                adminTabBtn.style.cursor = "not-allowed";
-            }
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                
+                authTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                authForms.forEach(form => form.classList.remove('active'));
+                document.getElementById(`${tabName}-form`).classList.add('active');
+            });
+        });
+
+        if (loginSubmit) {
+            loginSubmit.addEventListener('click', function() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (email && password) {
+                    loginUser(email, password);
+                } else {
+                    alert('Please fill in all fields!');
+                }
+            });
+        }
+
+        if (signupSubmit) {
+            signupSubmit.addEventListener('click', function() {
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const confirm = document.getElementById('signup-confirm').value;
+                
+                if (name && email && password && confirm) {
+                    if (password !== confirm) {
+                        alert('Passwords do not match!');
+                        return;
+                    }
+                    if (password.length < 6) {
+                        alert('Password must be at least 6 characters long!');
+                        return;
+                    }
+                    signupUser(name, email, password);
+                } else {
+                    alert('Please fill in all fields!');
+                }
+            });
+        }
+
+        if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+        if (profileBtn) profileBtn.addEventListener('click', showProfileSection);
+
+        if (saveProfile) saveProfile.addEventListener('click', saveUserProfile);
+        if (cancelProfile) {
+            cancelProfile.addEventListener('click', function() {
+                profileSection.classList.remove('active');
+            });
+        }
+
+        if (avatarUploadBtn) {
+            avatarUploadBtn.addEventListener('click', function() {
+                avatarUpload.click();
+            });
+        }
+        if (avatarUpload) avatarUpload.addEventListener('change', handleAvatarUpload);
+
+        if (trackOrderBtn) trackOrderBtn.addEventListener('click', showTrackOrderSection);
+
+        if (trackOrderSubmit) {
+            trackOrderSubmit.addEventListener('click', function() {
+                const orderId = orderIdInput.value.trim();
+                if (orderId) {
+                    trackOrder(orderId);
+                } else {
+                    alert('Please enter an order ID!');
+                }
+            });
+        }
+
+        if (orderHistoryBtn) orderHistoryBtn.addEventListener('click', showOrderHistory);
+
+        subscribeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const plan = this.getAttribute('data-plan');
+                handleSubscription(plan);
+            });
+        });
+
+        if (uploadCommunityBtn) uploadCommunityBtn.addEventListener('click', handleCommunityUpload);
+
+        footerLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = this.getAttribute('href');
+                if (target && target.startsWith('#')) {
+                    const element = document.querySelector(target);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } else {
+                    alert(`This would navigate to: ${target}`);
+                }
+            });
+        });
+
+        socialLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const platform = this.getAttribute('title');
+                alert(`This would open our ${platform} page in a new tab!`);
+            });
+        });
+
+        document.addEventListener('click', function() {
+            authModal.classList.remove('active');
+            userMenu.classList.remove('active');
+        });
+
+        if (authModal) {
+            authModal.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        if (userMenu) {
+            userMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         }
         
-        // Initialize the app
-        init();
-    </script>
-</body>
-</html>
+        if (adminTabBtn) {
+            adminTabBtn.disabled = true;
+            adminTabBtn.style.opacity = "0.5";
+            adminTabBtn.style.cursor = "not-allowed";
+        }
+    }
+    
+    // Initialize the app
+    init();
+</script>
