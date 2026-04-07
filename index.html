@@ -299,6 +299,216 @@
             background: #e4ddc6;
         }
 
+       /* Purchase Options Tabs */
+    .purchase-options-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid var(--cream);
+        padding-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .purchase-tab {
+        background: var(--cream);
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        color: var(--primary);
+        transition: all 0.3s;
+    }
+    
+    .purchase-tab.active {
+        background: var(--primary);
+        color: var(--cream);
+    }
+    
+    .purchase-tab:hover {
+        transform: translateY(-2px);
+    }
+    
+    .purchase-panel {
+        display: none;
+    }
+    
+    .purchase-panel.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    /* Subscription Plans Grid */
+    .subscription-plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin: 30px 0;
+    }
+    
+    .subscription-plan-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        position: relative;
+        transition: transform 0.3s;
+        border: 1px solid var(--border-color);
+    }
+    
+    .subscription-plan-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .subscription-plan-card.popular {
+        border: 2px solid var(--primary);
+        transform: scale(1.02);
+    }
+    
+    .popular-badge {
+        position: absolute;
+        top: -12px;
+        right: 20px;
+        background: var(--primary);
+        color: var(--cream);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .plan-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+    
+    .subscription-plan-card h4 {
+        font-size: 1.5rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+    
+    .plan-price {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary);
+        margin-bottom: 20px;
+    }
+    
+    .plan-price span {
+        font-size: 1rem;
+        font-weight: normal;
+    }
+    
+    .plan-features {
+        text-align: left;
+        margin: 20px 0;
+    }
+    
+    .plan-features p {
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .plan-features i {
+        color: var(--success-color);
+        width: 20px;
+    }
+    
+    .subscribe-plan-btn {
+        background: var(--primary);
+        color: var(--cream);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .subscribe-plan-btn:hover {
+        background: var(--primary-light);
+    }
+    
+    /* Bundle Grid */
+    .bundle-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin: 30px 0;
+    }
+    
+    .bundle-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    
+    .bundle-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .bundle-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+    
+    .bundle-card h4 {
+        font-size: 1.5rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+    
+    .bundle-price {
+        margin: 15px 0;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        margin-right: 10px;
+    }
+    
+    .sale-price {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    
+    .bundle-savings {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    
+    .add-bundle-btn {
+        background: var(--primary);
+        color: var(--cream);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    
+    .add-bundle-btn:hover {
+        background: var(--primary-light);
+    }
         /* User Profile Section */
         .profile-section {
             background: rgba(245, 245, 245, 0.95);
