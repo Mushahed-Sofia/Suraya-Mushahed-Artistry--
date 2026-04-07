@@ -3617,7 +3617,271 @@
             window.open('https://www.paypal.com/paypalme/smushahe', '_blank');
         });
     }
+        // ============================================
+    // PURCHASE OPTIONS / SUBSCRIPTIONS
+    // ============================================
     
+    // Subscription plans
+    const subscriptionPlans = [
+        {
+            id: 'basic',
+            name: 'Basic Plan',
+            price: 9.99,
+            stickersPerMonth: 3,
+            description: '3 unique stickers delivered monthly',
+            savings: 'Save 15%',
+            icon: 'fa-box'
+        },
+        {
+            id: 'premium',
+            name: 'Premium Plan',
+            price: 14.99,
+            stickersPerMonth: 6,
+            description: '6 unique stickers + exclusive designs',
+            savings: 'Save 25%',
+            icon: 'fa-gem',
+            popular: true
+        },
+        {
+            id: 'collector',
+            name: "Collector's Plan",
+            price: 24.99,
+            stickersPerMonth: 10,
+            description: '10 stickers + limited editions + free shipping',
+            savings: 'Save 35%',
+            icon: 'fa-crown'
+        }
+    ];
+    
+    // Sticker bundles
+    const stickerBundles = [
+        {
+            id: 'bundle_5',
+            name: '5 Sticker Bundle',
+            price: 19.99,
+            stickerCount: 5,
+            savings: 'Save $5',
+            icon: 'fa-layer-group',
+            originalPrice: 24.95
+        },
+        {
+            id: 'bundle_10',
+            name: '10 Sticker Bundle',
+            price: 34.99,
+            stickerCount: 10,
+            savings: 'Save $15',
+            icon: 'fa-boxes',
+            originalPrice: 49.90
+        },
+        {
+            id: 'bundle_20',
+            name: 'Complete Collection',
+            price: 59.99,
+            stickerCount: 20,
+            savings: 'Save $30',
+            icon: 'fa-gift',
+            originalPrice: 89.80
+        }
+    ];
+    
+    // Selected purchase option
+    let selectedPurchaseOption = 'single';
+    let selectedPlan = null;
+    let selectedBundle = null;
+    
+    // Render purchase options panel
+    function renderPurchaseOptions() {
+        const purchaseOptionsContainer = document.getElementById('purchase-options-container');
+        if (!purchaseOptionsContainer) return;
+        
+        purchaseOptionsContainer.innerHTML = `
+            <div class="purchase-options-tabs">
+                <button class="purchase-tab ${selectedPurchaseOption === 'single' ? 'active' : ''}" onclick="selectPurchaseTab('single')">
+                    <i class="fas fa-shopping-cart"></i> Single Stickers
+                </button>
+                <button class="purchase-tab ${selectedPurchaseOption === 'subscription' ? 'active' : ''}" onclick="selectPurchaseTab('subscription')">
+                    <i class="fas fa-calendar-alt"></i> Monthly Subscription
+                </button>
+                <button class="purchase-tab ${selectedPurchaseOption === 'bundle' ? 'active' : ''}" onclick="selectPurchaseTab('bundle')">
+                    <i class="fas fa-gift"></i> Sticker Bundles
+                </button>
+            </div>
+            
+            <div id="single-purchase-panel" class="purchase-panel ${selectedPurchaseOption === 'single' ? 'active' : ''}">
+                <div class="sticker-grid" id="sticker-container"></div>
+            </div>
+            
+            <div id="subscription-panel" class="purchase-panel ${selectedPurchaseOption === 'subscription' ? 'active' : ''}">
+                <div class="subscription-plans-grid">
+                    ${subscriptionPlans.map(plan => `
+                        <div class="subscription-plan-card ${plan.popular ? 'popular' : ''}">
+                            ${plan.popular ? '<div class="popular-badge">Most Popular</div>' : ''}
+                            <div class="plan-icon"><i class="fas ${plan.icon}"></i></div>
+                            <h4>${plan.name}</h4>
+                            <div class="plan-price">$${plan.price}<span>/month</span></div>
+                            <div class="plan-features">
+                                <p><i class="fas fa-check"></i> ${plan.stickersPerMonth} stickers monthly</p>
+                                <p><i class="fas fa-check"></i> ${plan.description}</p>
+                                <p><i class="fas fa-tag"></i> ${plan.savings}</p>
+                            </div>
+                            <button class="subscribe-plan-btn" data-plan-id="${plan.id}">
+                                Subscribe Now
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div id="bundle-panel" class="purchase-panel ${selectedPurchaseOption === 'bundle' ? 'active' : ''}">
+                <div class="bundle-grid">
+                    ${stickerBundles.map(bundle => `
+                        <div class="bundle-card">
+                            <div class="bundle-icon"><i class="fas ${bundle.icon}"></i></div>
+                            <h4>${bundle.name}</h4>
+                            <div class="bundle-price">
+                                <span class="original-price">$${bundle.originalPrice.toFixed(2)}</span>
+                                <span class="sale-price">$${bundle.price.toFixed(2)}</span>
+                            </div>
+                            <div class="bundle-savings">${bundle.savings}</div>
+                            <p>${bundle.stickerCount} carefully curated Afghan heritage stickers</p>
+                            <button class="add-bundle-btn" data-bundle-id="${bundle.id}">
+                                Add Bundle to Cart
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        // Re-render stickers in single purchase panel
+        if (selectedPurchaseOption === 'single') {
+            renderStickersInContainer();
+        }
+        
+        // Add event listeners for subscription buttons
+        document.querySelectorAll('.subscribe-plan-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const planId = btn.dataset.planId;
+                subscribeToPlan(planId);
+            });
+        });
+        
+        // Add event listeners for bundle buttons
+        document.querySelectorAll('.add-bundle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const bundleId = btn.dataset.bundleId;
+                addBundleToCart(bundleId);
+            });
+        });
+    }
+    
+    function renderStickersInContainer() {
+        const container = document.getElementById('sticker-container');
+        if (!container) return;
+        
+        container.innerHTML = stickers.map(sticker => `
+            <div class="sticker-card">
+                ${sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : ''}
+                <div class="sticker-img">
+                    ${sticker.customImage ? `<img src="${sticker.customImage}" alt="${sticker.title}">` : `<img src="${sticker.image}" alt="${sticker.title}">`}
+                </div>
+                <div class="sticker-info">
+                    <h3 class="sticker-title">${sticker.title}</h3>
+                    <p class="sticker-desc">${sticker.description}</p>
+                    <div class="sticker-price">$${sticker.price.toFixed(2)}</div>
+                    <div class="purchase-options">
+                        <div class="quantity-selector">
+                            <button class="qty-btn minus">-</button>
+                            <input type="text" class="qty-input" value="1">
+                            <button class="qty-btn plus">+</button>
+                        </div>
+                        <button class="add-cart-btn" data-id="${sticker.id}">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.qty-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('.qty-input');
+                let value = parseInt(input.value);
+                if (this.classList.contains('plus')) value++;
+                else if (value > 1) value--;
+                input.value = value;
+            });
+        });
+        
+        document.querySelectorAll('.add-cart-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = parseInt(this.dataset.id);
+                const quantity = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
+                addToCart(id, quantity);
+                const sticker = stickers.find(s => s.id === id);
+                alert(`Added ${quantity} "${sticker.title}" to your cart!`);
+                this.closest('.purchase-options').querySelector('.qty-input').value = "1";
+            });
+        });
+    }
+    
+    function selectPurchaseTab(tab) {
+        selectedPurchaseOption = tab;
+        renderPurchaseOptions();
+    }
+    
+    function subscribeToPlan(planId) {
+        if (!currentUser) {
+            alert('Please login to subscribe');
+            authModal.classList.add('active');
+            return;
+        }
+        
+        const plan = subscriptionPlans.find(p => p.id === planId);
+        if (!plan) return;
+        
+        if (confirm(`Subscribe to ${plan.name} for $${plan.price}/month?\n\nYou'll receive ${plan.stickersPerMonth} unique stickers every month!\n\nYou can cancel anytime.`)) {
+            const subscription = {
+                id: 'SUB-' + Date.now(),
+                planId: plan.id,
+                planName: plan.name,
+                price: plan.price,
+                startDate: new Date().toISOString(),
+                status: 'active',
+                userId: currentUser.id
+            };
+            
+            subscriptions.push(subscription);
+            localStorage.setItem('stickerShopSubscriptions', JSON.stringify(subscriptions));
+            
+            alert(`✅ Successfully subscribed to ${plan.name}!\n\nYour first box will be shipped within 5-7 business days.\n\nA PayPal invoice has been sent to ${currentUser.email}.`);
+            
+            window.open('https://www.paypal.com/paypalme/smushahe', '_blank');
+        }
+    }
+    
+    function addBundleToCart(bundleId) {
+        if (!currentUser) {
+            alert('Please login to purchase bundles');
+            authModal.classList.add('active');
+            return;
+        }
+        
+        const bundle = stickerBundles.find(b => b.id === bundleId);
+        if (!bundle) return;
+        
+        cart.push({
+            id: bundle.id,
+            title: bundle.name,
+            price: bundle.price,
+            quantity: 1,
+            isBundle: true,
+            stickerCount: bundle.stickerCount
+        });
+        
+        updateCart();
+        alert(`✅ Added ${bundle.name} to your cart!\n\nTotal: $${bundle.price.toFixed(2)}\n\nYou'll receive ${bundle.stickerCount} stickers!`);
+    }
     // ============================================
     // END OF PAYPAL FIX
     // ============================================
