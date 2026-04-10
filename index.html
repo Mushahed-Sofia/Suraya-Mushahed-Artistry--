@@ -3195,7 +3195,7 @@
         </div>
     </footer>
 
- <script>
+<script>
     // Store for stickers, gallery items, and cart
     let stickers = [
         {
@@ -3449,6 +3449,199 @@
     const previewCardNumber = document.getElementById('preview-card-number');
     const previewExpiry = document.getElementById('preview-expiry');
     const previewCardName = document.getElementById('preview-card-name');
+    
+    // ============================================
+    // PERMANENT IMAGE STORAGE (MULTIPLE BACKUPS)
+    // ============================================
+    
+    // Save ALL sticker data permanently
+    function saveAllStickerData() {
+        try {
+            // Save to multiple storage locations for redundancy
+            const stickerData = stickers.map(sticker => ({
+                id: sticker.id,
+                title: sticker.title,
+                price: sticker.price,
+                description: sticker.description,
+                image: sticker.image,
+                customImage: sticker.customImage,
+                limitedEdition: sticker.limitedEdition
+            }));
+            
+            // Primary storage
+            localStorage.setItem('suraya_stickers_backup', JSON.stringify(stickerData));
+            
+            // Secondary storage (session storage as backup)
+            sessionStorage.setItem('suraya_stickers_backup', JSON.stringify(stickerData));
+            
+            // Also save individual custom images
+            const customImages = {};
+            stickers.forEach(sticker => {
+                if (sticker.customImage) {
+                    customImages[sticker.id] = sticker.customImage;
+                }
+            });
+            localStorage.setItem('suraya_custom_images', JSON.stringify(customImages));
+            
+            console.log('✅ All sticker data saved permanently');
+            return true;
+        } catch (error) {
+            console.error('Error saving sticker data:', error);
+            return false;
+        }
+    }
+    
+    // Load ALL sticker data from backups
+    function loadAllStickerData() {
+        try {
+            // Try primary storage first
+            let savedData = localStorage.getItem('suraya_stickers_backup');
+            
+            // If primary empty, try session storage
+            if (!savedData) {
+                savedData = sessionStorage.getItem('suraya_stickers_backup');
+            }
+            
+            if (savedData) {
+                const savedStickers = JSON.parse(savedData);
+                
+                // Restore stickers while preserving current structure
+                savedStickers.forEach(savedSticker => {
+                    const existingSticker = stickers.find(s => s.id === savedSticker.id);
+                    if (existingSticker) {
+                        existingSticker.customImage = savedSticker.customImage;
+                        existingSticker.title = savedSticker.title;
+                        existingSticker.price = savedSticker.price;
+                        existingSticker.description = savedSticker.description;
+                    }
+                });
+                
+                // Load custom images separately
+                const customImages = localStorage.getItem('suraya_custom_images');
+                if (customImages) {
+                    const images = JSON.parse(customImages);
+                    stickers.forEach(sticker => {
+                        if (images[sticker.id]) {
+                            sticker.customImage = images[sticker.id];
+                        }
+                    });
+                }
+                
+                console.log('✅ Sticker data loaded from permanent storage');
+                return true;
+            }
+            
+            console.log('No saved sticker data found');
+            return false;
+        } catch (error) {
+            console.error('Error loading sticker data:', error);
+            return false;
+        }
+    }
+    
+    // Save uploaded sticker images to multiple locations
+    function saveImagesToStorage() {
+        try {
+            const imageData = [];
+            stickers.forEach(sticker => {
+                if (sticker.customImage) {
+                    imageData.push({ id: sticker.id, image: sticker.customImage });
+                }
+            });
+            
+            // Save to multiple storage locations
+            localStorage.setItem('suraya_sticker_images', JSON.stringify(imageData));
+            sessionStorage.setItem('suraya_sticker_images_backup', JSON.stringify(imageData));
+            
+            // Also save timestamp to know when last saved
+            localStorage.setItem('suraya_last_save', new Date().toISOString());
+            
+            saveAllStickerData();
+            
+            console.log('✅ Sticker images saved to multiple storage locations');
+            return true;
+        } catch (error) {
+            console.error('Error saving sticker images:', error);
+            return false;
+        }
+    }
+    
+    // Load sticker images from storage
+    function loadImagesFromStorage() {
+        try {
+            // Try primary storage first
+            let savedImages = localStorage.getItem('suraya_sticker_images');
+            
+            // If primary empty, try backup
+            if (!savedImages) {
+                savedImages = sessionStorage.getItem('suraya_sticker_images_backup');
+            }
+            
+            if (savedImages) {
+                const imageData = JSON.parse(savedImages);
+                console.log(`📸 Loading ${imageData.length} saved sticker images`);
+                
+                imageData.forEach(data => {
+                    const sticker = stickers.find(s => s.id === data.id);
+                    if (sticker) {
+                        sticker.customImage = data.image;
+                    }
+                });
+                
+                // Also try to load from full backup
+                loadAllStickerData();
+                
+                // Re-render to show loaded images
+                if (typeof renderStickers === 'function') {
+                    renderStickers();
+                }
+                if (selectedPurchaseOption === 'single' && typeof renderStickersInContainer === 'function') {
+                    renderStickersInContainer();
+                }
+                
+                return true;
+            }
+            
+            console.log('No saved images found');
+            return false;
+        } catch (error) {
+            console.error('Error loading sticker images:', error);
+            return false;
+        }
+    }
+    
+    // Save gallery images to storage
+    function saveGalleryImagesToStorage() {
+        try {
+            if (surpriseImages && surpriseImages.length > 0) {
+                localStorage.setItem('suraya_gallery_images', JSON.stringify(surpriseImages));
+                sessionStorage.setItem('suraya_gallery_images_backup', JSON.stringify(surpriseImages));
+                console.log('✅ Gallery images saved to storage');
+            }
+        } catch (error) {
+            console.error('Error saving gallery images:', error);
+        }
+    }
+    
+    // Load gallery images from storage
+    function loadGalleryImagesFromStorage() {
+        try {
+            let savedGallery = localStorage.getItem('suraya_gallery_images');
+            if (!savedGallery) {
+                savedGallery = sessionStorage.getItem('suraya_gallery_images_backup');
+            }
+            
+            if (savedGallery) {
+                surpriseImages = JSON.parse(savedGallery);
+                if (typeof renderGallery === 'function') {
+                    renderGallery();
+                }
+                console.log('📸 Gallery images loaded from storage');
+            }
+        } catch (error) {
+            console.error('Error loading gallery images:', error);
+        }
+    }
     
     // ============================================
     // PURCHASE OPTIONS / SUBSCRIPTIONS
@@ -3715,70 +3908,6 @@
     }
     
     // ============================================
-    // IMAGE STORAGE FUNCTIONS
-    // ============================================
-    
-    function saveImagesToStorage() {
-        try {
-            const imageData = [];
-            stickers.forEach(sticker => {
-                if (sticker.customImage) {
-                    imageData.push({ id: sticker.id, image: sticker.customImage });
-                }
-            });
-            localStorage.setItem('suraya_sticker_images', JSON.stringify(imageData));
-            console.log('✅ Sticker images saved to storage');
-        } catch (error) {
-            console.error('Error saving sticker images:', error);
-        }
-    }
-    
-    function loadImagesFromStorage() {
-        try {
-            const savedImages = localStorage.getItem('suraya_sticker_images');
-            if (savedImages) {
-                const imageData = JSON.parse(savedImages);
-                console.log(`📸 Loading ${imageData.length} saved sticker images`);
-                imageData.forEach(data => {
-                    const sticker = stickers.find(s => s.id === data.id);
-                    if (sticker) {
-                        sticker.customImage = data.image;
-                    }
-                });
-                if (selectedPurchaseOption === 'single') {
-                    renderStickersInContainer();
-                }
-            }
-        } catch (error) {
-            console.error('Error loading sticker images:', error);
-        }
-    }
-    
-    function saveGalleryImagesToStorage() {
-        try {
-            if (surpriseImages && surpriseImages.length > 0) {
-                localStorage.setItem('suraya_gallery_images', JSON.stringify(surpriseImages));
-                console.log('✅ Gallery images saved to storage');
-            }
-        } catch (error) {
-            console.error('Error saving gallery images:', error);
-        }
-    }
-    
-    function loadGalleryImagesFromStorage() {
-        try {
-            const savedGallery = localStorage.getItem('suraya_gallery_images');
-            if (savedGallery) {
-                surpriseImages = JSON.parse(savedGallery);
-                renderGallery();
-                console.log('📸 Gallery images loaded from storage');
-            }
-        } catch (error) {
-            console.error('Error loading gallery images:', error);
-        }
-    }
-    
-    // ============================================
     // FIXED: WORKING PAYPAL BUTTON
     // ============================================
     
@@ -3872,6 +4001,10 @@
     
     function init() {
         try {
+            // Load saved images FIRST before rendering
+            loadImagesFromStorage();
+            loadGalleryImagesFromStorage();
+            
             renderStickers();
             renderGallery();
             renderCommunityGallery();
@@ -3884,12 +4017,16 @@
             loadOrderHistory();
             
             renderPurchaseOptions();
-            loadImagesFromStorage();
-            loadGalleryImagesFromStorage();
             
             activateAllButtons();
             
-            console.log("Afghan Sticker Artistry initialized successfully!");
+            // Show status message about saved data
+            const lastSave = localStorage.getItem('suraya_last_save');
+            if (lastSave) {
+                console.log(`Last data save: ${new Date(lastSave).toLocaleString()}`);
+            }
+            
+            console.log("Afghan Sticker Artistry initialized successfully with permanent storage!");
         } catch (error) {
             console.error("Initialization error:", error);
             alert("There was an error initializing the application. Please refresh the page.");
@@ -4779,6 +4916,7 @@
                 if (selectedPurchaseOption === 'single') {
                     renderStickersInContainer();
                 }
+                saveImagesToStorage();
                 alert(`"${sticker.title}" has been deleted successfully!`);
             }
         } catch (error) {
@@ -5587,6 +5725,7 @@
                 renderStickers();
                 renderGallery();
                 addStickerForm.reset();
+                saveImagesToStorage();
                 
                 alert(`"${title}" has been added to your store!`);
             });
@@ -5794,4 +5933,4 @@
     
     // Initialize the app
     init();
-</script>
+</script> 
