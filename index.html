@@ -8,17 +8,14 @@
 <meta http-equiv="X-XSS-Protection" content="1; mode=block">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
-<!-- Rest of your head content remains the same -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Suraya's Artistry | Celebrate Our Resistance. Sofia Mushahed</title>
 
-<!-- Preconnect with crossorigin for external resources -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-<!-- Your existing stylesheets -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&family=Ballet&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -3196,6 +3193,10 @@
     </footer>
 
 <script>
+    // ============================================
+    // PERMANENT IMAGE STORAGE - FIXED VERSION
+    // ============================================
+    
     // Store for stickers, gallery items, and cart
     let stickers = [
         {
@@ -3451,14 +3452,112 @@
     const previewCardName = document.getElementById('preview-card-name');
     
     // ============================================
-    // PERMANENT IMAGE STORAGE (MULTIPLE BACKUPS)
+    // PERMANENT IMAGE STORAGE - FIXED VERSION
     // ============================================
     
-    // Save ALL sticker data permanently
-    function saveAllStickerData() {
+    // Save uploaded sticker images to multiple locations
+    function saveImagesToStorage() {
         try {
+            console.log("💾 Saving images to storage...");
+            
+            const imageData = [];
+            stickers.forEach(sticker => {
+                if (sticker.customImage && sticker.customImage.startsWith('data:image')) {
+                    imageData.push({ 
+                        id: sticker.id, 
+                        image: sticker.customImage,
+                        title: sticker.title,
+                        timestamp: Date.now()
+                    });
+                }
+            });
+            
+            if (imageData.length === 0) {
+                console.log("No custom images to save");
+                return false;
+            }
+            
             // Save to multiple storage locations for redundancy
-            const stickerData = stickers.map(sticker => ({
+            localStorage.setItem('suraya_sticker_images', JSON.stringify(imageData));
+            sessionStorage.setItem('suraya_sticker_images_backup', JSON.stringify(imageData));
+            
+            // Also save individual sticker data
+            const stickerBackup = stickers.map(s => ({
+                id: s.id,
+                customImage: s.customImage,
+                title: s.title,
+                price: s.price
+            }));
+            localStorage.setItem('suraya_stickers_full_backup', JSON.stringify(stickerBackup));
+            localStorage.setItem('suraya_last_save', new Date().toISOString());
+            
+            console.log(`✅ Saved ${imageData.length} custom images to storage`);
+            return true;
+        } catch (error) {
+            console.error('Error saving sticker images:', error);
+            return false;
+        }
+    }
+    
+    // Load sticker images from storage - FIXED to work without dependencies
+    function loadImagesFromStorage() {
+        try {
+            console.log("📸 Loading images from storage...");
+            
+            // Try multiple storage locations
+            let savedImages = localStorage.getItem('suraya_sticker_images');
+            if (!savedImages) {
+                savedImages = sessionStorage.getItem('suraya_sticker_images_backup');
+            }
+            
+            if (savedImages) {
+                const imageData = JSON.parse(savedImages);
+                console.log(`Found ${imageData.length} saved custom images`);
+                
+                // Apply saved images to stickers
+                imageData.forEach(data => {
+                    const sticker = stickers.find(s => s.id === data.id);
+                    if (sticker && data.image && data.image.startsWith('data:image')) {
+                        sticker.customImage = data.image;
+                        console.log(`✅ Restored image for sticker: ${sticker.title}`);
+                    }
+                });
+                
+                // Also try to load from full backup
+                const fullBackup = localStorage.getItem('suraya_stickers_full_backup');
+                if (fullBackup) {
+                    const backupData = JSON.parse(fullBackup);
+                    backupData.forEach(backup => {
+                        const sticker = stickers.find(s => s.id === backup.id);
+                        if (sticker && backup.customImage && !sticker.customImage) {
+                            sticker.customImage = backup.customImage;
+                        }
+                    });
+                }
+                
+                // Re-render stickers (safely check if functions exist)
+                if (typeof renderStickers === 'function') {
+                    renderStickers();
+                }
+                if (typeof renderStickersInContainer === 'function') {
+                    renderStickersInContainer();
+                }
+                
+                return true;
+            }
+            
+            console.log("No saved images found");
+            return false;
+        } catch (error) {
+            console.error('Error loading sticker images:', error);
+            return false;
+        }
+    }
+    
+    // Force save after any image modification
+    function forceSaveAllStickerData() {
+        try {
+            const completeStickerData = stickers.map(sticker => ({
                 id: sticker.id,
                 title: sticker.title,
                 price: sticker.price,
@@ -3468,144 +3567,11 @@
                 limitedEdition: sticker.limitedEdition
             }));
             
-            // Primary storage
-            localStorage.setItem('suraya_stickers_backup', JSON.stringify(stickerData));
-            
-            // Secondary storage (session storage as backup)
-            sessionStorage.setItem('suraya_stickers_backup', JSON.stringify(stickerData));
-            
-            // Also save individual custom images
-            const customImages = {};
-            stickers.forEach(sticker => {
-                if (sticker.customImage) {
-                    customImages[sticker.id] = sticker.customImage;
-                }
-            });
-            localStorage.setItem('suraya_custom_images', JSON.stringify(customImages));
-            
-            console.log('✅ All sticker data saved permanently');
+            localStorage.setItem('suraya_complete_sticker_backup', JSON.stringify(completeStickerData));
+            console.log("✅ Complete sticker data forced save");
             return true;
         } catch (error) {
-            console.error('Error saving sticker data:', error);
-            return false;
-        }
-    }
-    
-    // Load ALL sticker data from backups
-    function loadAllStickerData() {
-        try {
-            // Try primary storage first
-            let savedData = localStorage.getItem('suraya_stickers_backup');
-            
-            // If primary empty, try session storage
-            if (!savedData) {
-                savedData = sessionStorage.getItem('suraya_stickers_backup');
-            }
-            
-            if (savedData) {
-                const savedStickers = JSON.parse(savedData);
-                
-                // Restore stickers while preserving current structure
-                savedStickers.forEach(savedSticker => {
-                    const existingSticker = stickers.find(s => s.id === savedSticker.id);
-                    if (existingSticker) {
-                        existingSticker.customImage = savedSticker.customImage;
-                        existingSticker.title = savedSticker.title;
-                        existingSticker.price = savedSticker.price;
-                        existingSticker.description = savedSticker.description;
-                    }
-                });
-                
-                // Load custom images separately
-                const customImages = localStorage.getItem('suraya_custom_images');
-                if (customImages) {
-                    const images = JSON.parse(customImages);
-                    stickers.forEach(sticker => {
-                        if (images[sticker.id]) {
-                            sticker.customImage = images[sticker.id];
-                        }
-                    });
-                }
-                
-                console.log('✅ Sticker data loaded from permanent storage');
-                return true;
-            }
-            
-            console.log('No saved sticker data found');
-            return false;
-        } catch (error) {
-            console.error('Error loading sticker data:', error);
-            return false;
-        }
-    }
-    
-    // Save uploaded sticker images to multiple locations
-    function saveImagesToStorage() {
-        try {
-            const imageData = [];
-            stickers.forEach(sticker => {
-                if (sticker.customImage) {
-                    imageData.push({ id: sticker.id, image: sticker.customImage });
-                }
-            });
-            
-            // Save to multiple storage locations
-            localStorage.setItem('suraya_sticker_images', JSON.stringify(imageData));
-            sessionStorage.setItem('suraya_sticker_images_backup', JSON.stringify(imageData));
-            
-            // Also save timestamp to know when last saved
-            localStorage.setItem('suraya_last_save', new Date().toISOString());
-            
-            saveAllStickerData();
-            
-            console.log('✅ Sticker images saved to multiple storage locations');
-            return true;
-        } catch (error) {
-            console.error('Error saving sticker images:', error);
-            return false;
-        }
-    }
-    
-    // Load sticker images from storage
-    function loadImagesFromStorage() {
-        try {
-            // Try primary storage first
-            let savedImages = localStorage.getItem('suraya_sticker_images');
-            
-            // If primary empty, try backup
-            if (!savedImages) {
-                savedImages = sessionStorage.getItem('suraya_sticker_images_backup');
-            }
-            
-            if (savedImages) {
-                const imageData = JSON.parse(savedImages);
-                console.log(`📸 Loading ${imageData.length} saved sticker images`);
-                
-                imageData.forEach(data => {
-                    const sticker = stickers.find(s => s.id === data.id);
-                    if (sticker) {
-                        sticker.customImage = data.image;
-                    }
-                });
-                
-                // Also try to load from full backup
-                loadAllStickerData();
-                
-                // Re-render to show loaded images
-                if (typeof renderStickers === 'function') {
-                    renderStickers();
-                }
-                if (selectedPurchaseOption === 'single' && typeof renderStickersInContainer === 'function') {
-                    renderStickersInContainer();
-                }
-                
-                return true;
-            }
-            
-            console.log('No saved images found');
-            return false;
-        } catch (error) {
-            console.error('Error loading sticker images:', error);
+            console.error("Force save failed:", error);
             return false;
         }
     }
@@ -3996,9 +3962,306 @@
     }
     
     // ============================================
-    // INITIALIZATION
+    // RENDER FUNCTIONS
     // ============================================
     
+    function renderStickers() {
+        try {
+            stickerContainer.innerHTML = '';
+            
+            stickers.forEach(sticker => {
+                const stickerCard = document.createElement('div');
+                stickerCard.className = 'sticker-card';
+                
+                const badge = sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : '';
+                const imageContent = sticker.customImage 
+                    ? `<img src="${sticker.customImage}" alt="${sticker.title}">`
+                    : `<img src="${sticker.image}" alt="${sticker.title}">`;
+                
+                const editButton = isUnlocked 
+                    ? `<button class="edit-sticker-btn" data-id="${sticker.id}"><i class="fas fa-edit"></i></button>`
+                    : '';
+                const deleteButton = isUnlocked 
+                    ? `<button class="delete-sticker-btn" data-id="${sticker.id}"><i class="fas fa-trash"></i></button>`
+                    : '';
+                
+                stickerCard.innerHTML = `
+                    ${badge}
+                    ${editButton}
+                    ${deleteButton}
+                    <div class="sticker-img">
+                        ${imageContent}
+                    </div>
+                    <div class="sticker-info">
+                        <h3 class="sticker-title">${sticker.title}</h3>
+                        <p class="sticker-desc">${sticker.description}</p>
+                        <div class="sticker-price">$${sticker.price.toFixed(2)}</div>
+                        <div class="purchase-options">
+                            <div class="quantity-selector">
+                                <button class="qty-btn minus">-</button>
+                                <input type="text" class="qty-input" value="1">
+                                <button class="qty-btn plus">+</button>
+                            </div>
+                            <button class="add-cart-btn" data-id="${sticker.id}">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                stickerContainer.appendChild(stickerCard);
+            });
+            
+            document.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('.qty-input');
+                    let value = parseInt(input.value);
+                    
+                    if (this.classList.contains('plus')) {
+                        value++;
+                    } else if (this.classList.contains('minus') && value > 1) {
+                        value--;
+                    }
+                    
+                    input.value = value;
+                });
+            });
+            
+            document.querySelectorAll('.add-cart-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    const quantity = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
+                    addToCart(id, quantity);
+                    const sticker = stickers.find(s => s.id === id);
+                    alert(`Added ${quantity} "${sticker.title}" sticker(s) to your cart!`);
+                    this.closest('.purchase-options').querySelector('.qty-input').value = "1";
+                });
+            });
+            
+            if (isUnlocked) {
+                document.querySelectorAll('.edit-sticker-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        openStickerImageUpload(id);
+                    });
+                });
+
+                document.querySelectorAll('.delete-sticker-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteSticker(id);
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Error in renderStickers:", error);
+        }
+    }
+    
+    function renderGallery() {
+        try {
+            const allGalleryItems = [
+                ...stickers.filter(s => s.image), 
+                ...surpriseImages
+            ];
+            
+            galleryContainer.innerHTML = '';
+            galleryDots.innerHTML = '';
+            
+            if (allGalleryItems.length === 0) {
+                galleryContainer.innerHTML = `
+                    <div class="gallery-item">
+                        <div class="gallery-image" style="background: #e4ddc6; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-images" style="font-size: 4rem; color: #757331;"></i>
+                        </div>
+                        <div class="gallery-caption">
+                            <h3>No gallery items yet</h3>
+                            <p>Add some images in the admin panel</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            allGalleryItems.forEach((item, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.caption}" class="gallery-image">
+                    <div class="gallery-caption">
+                        <h3>${item.caption}</h3>
+                        ${item.title ? `<p>Only $${item.price} - ${item.description}</p>` : ''}
+                    </div>
+                `;
+                galleryContainer.appendChild(galleryItem);
+                
+                const dot = document.createElement('div');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dot.setAttribute('data-index', index);
+                dot.addEventListener('click', () => {
+                    goToGallerySlide(index);
+                });
+                galleryDots.appendChild(dot);
+            });
+            
+            updateGalleryPosition();
+        } catch (error) {
+            console.error("Error in renderGallery:", error);
+        }
+    }
+    
+    function renderCommunityGallery() {
+        try {
+            communityGrid.innerHTML = '';
+            
+            communityImages.forEach(item => {
+                const communityItem = document.createElement('div');
+                communityItem.className = 'community-item';
+                communityItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.caption}" class="community-image">
+                    <div class="community-info">
+                        <div class="community-user">
+                            <img src="${item.avatar}" alt="${item.user}" class="user-avatar">
+                            <span class="user-name">${item.user}</span>
+                        </div>
+                        <p class="community-caption">${item.caption}</p>
+                    </div>
+                `;
+                communityGrid.appendChild(communityItem);
+            });
+        } catch (error) {
+            console.error("Error in renderCommunityGallery:", error);
+        }
+    }
+    
+    // CART FUNCTIONS
+    function addToCart(id, quantity) {
+        try {
+            const sticker = stickers.find(s => s.id === id);
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: sticker.id,
+                    title: sticker.title,
+                    price: sticker.price,
+                    quantity: quantity
+                });
+            }
+            
+            updateCart();
+        } catch (error) {
+            console.error("Error in addToCart:", error);
+            alert("There was an error adding the item to your cart. Please try again.");
+        }
+    }
+    
+    function removeFromCart(id) {
+        try {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        } catch (error) {
+            console.error("Error in removeFromCart:", error);
+        }
+    }
+    
+    function updateCart() {
+        try {
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<div class="cart-item">Your cart is empty</div>';
+                checkoutBtn.disabled = true;
+                checkoutBtn.style.opacity = '0.6';
+                checkoutBtn.style.cursor = 'not-allowed';
+                cartTotal.textContent = '$0.00';
+            } else {
+                let subtotal = 0;
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+                    
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <span>${item.title} (${item.quantity}):</span>
+                        <div class="cart-item-actions">
+                            <span>$${itemTotal.toFixed(2)}</span>
+                            <button class="remove-item" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                const total = subtotal + shippingCost;
+                cartTotal.textContent = `$${total.toFixed(2)}`;
+                
+                checkoutBtn.disabled = false;
+                checkoutBtn.style.opacity = '1';
+                checkoutBtn.style.cursor = 'pointer';
+                
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        removeFromCart(id);
+                    });
+                });
+            }
+        } catch (error) {
+            console.error("Error in updateCart:", error);
+        }
+    }
+    
+    function showCheckoutForm() {
+        try {
+            checkoutForm.style.display = 'block';
+            updateCheckoutSummary();
+        } catch (error) {
+            console.error("Error in showCheckoutForm:", error);
+        }
+    }
+    
+    function hideCheckoutForm() {
+        try {
+            checkoutForm.style.display = 'none';
+        } catch (error) {
+            console.error("Error in hideCheckoutForm:", error);
+        }
+    }
+    
+    function updateCheckoutSummary() {
+        try {
+            checkoutItems.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const checkoutItem = document.createElement('div');
+                checkoutItem.className = 'checkout-summary-item';
+                checkoutItem.innerHTML = `
+                    <span>${item.title} (${item.quantity})</span>
+                    <span>$${itemTotal.toFixed(2)}</span>
+                `;
+                checkoutItems.appendChild(checkoutItem);
+            });
+            
+            const total = subtotal + shippingCost;
+            checkoutShipping.textContent = `$${shippingCost.toFixed(2)}`;
+            checkoutTotal.textContent = `$${total.toFixed(2)}`;
+        } catch (error) {
+            console.error("Error in updateCheckoutSummary:", error);
+        }
+    }
+    
+    // INITIALIZATION
     function init() {
         try {
             // Load saved images FIRST before rendering
@@ -4033,7 +4296,6 @@
         }
     }
     
-    // Function to activate all buttons
     function activateAllButtons() {
         const allButtons = document.querySelectorAll('button, .btn, .auth-tab, .tab-btn, .user-menu-item, .footer-links a, .social-icons a, .gallery-nav, .dot, .qty-btn, .add-cart-btn, .remove-item, .checkout-btn, .subscribe-btn, .upload-community-btn, .profile-upload-btn, .edit-sticker-btn, .delete-sticker-btn, .access-toggle, .dev-option, .scroll-down');
         
@@ -4443,7 +4705,6 @@
         }
     }
 
-    // PROFILE FUNCTIONS
     function showProfileSection() {
         try {
             if (!currentUser) {
@@ -4540,7 +4801,6 @@
         }
     }
 
-    // TRACK ORDER FUNCTIONS
     function trackOrder(orderId) {
         try {
             const order = orders.find(o => o.id === orderId);
@@ -4593,7 +4853,6 @@
         userMenu.classList.remove('active');
     }
 
-    // ORDER HISTORY FUNCTIONS
     function loadOrderHistory() {
         try {
             if (!currentUser) return;
@@ -4731,7 +4990,6 @@
         }
     }
     
-    // SUBSCRIPTION FUNCTIONS
     function handleSubscription(plan) {
         try {
             if (!currentUser) {
@@ -4770,31 +5028,6 @@
         }
     }
     
-    // COMMUNITY GALLERY FUNCTIONS
-    function renderCommunityGallery() {
-        try {
-            communityGrid.innerHTML = '';
-            
-            communityImages.forEach(item => {
-                const communityItem = document.createElement('div');
-                communityItem.className = 'community-item';
-                communityItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.caption}" class="community-image">
-                    <div class="community-info">
-                        <div class="community-user">
-                            <img src="${item.avatar}" alt="${item.user}" class="user-avatar">
-                            <span class="user-name">${item.user}</span>
-                        </div>
-                        <p class="community-caption">${item.caption}</p>
-                    </div>
-                `;
-                communityGrid.appendChild(communityItem);
-            });
-        } catch (error) {
-            console.error("Error in renderCommunityGallery:", error);
-        }
-    }
-
     function handleCommunityUpload() {
         try {
             if (!currentUser) {
@@ -4808,100 +5041,6 @@
         }
     }
     
-    // RENDER STICKERS (Original)
-    function renderStickers() {
-        try {
-            stickerContainer.innerHTML = '';
-            
-            stickers.forEach(sticker => {
-                const stickerCard = document.createElement('div');
-                stickerCard.className = 'sticker-card';
-                
-                const badge = sticker.limitedEdition ? '<div class="product-badge">Limited Edition</div>' : '';
-                const imageContent = sticker.customImage 
-                    ? `<img src="${sticker.customImage}" alt="${sticker.title}">`
-                    : `<img src="${sticker.image}" alt="${sticker.title}">`;
-                
-                const editButton = isUnlocked 
-                    ? `<button class="edit-sticker-btn" data-id="${sticker.id}"><i class="fas fa-edit"></i></button>`
-                    : '';
-                const deleteButton = isUnlocked 
-                    ? `<button class="delete-sticker-btn" data-id="${sticker.id}"><i class="fas fa-trash"></i></button>`
-                    : '';
-                
-                stickerCard.innerHTML = `
-                    ${badge}
-                    ${editButton}
-                    ${deleteButton}
-                    <div class="sticker-img">
-                        ${imageContent}
-                    </div>
-                    <div class="sticker-info">
-                        <h3 class="sticker-title">${sticker.title}</h3>
-                        <p class="sticker-desc">${sticker.description}</p>
-                        <div class="sticker-price">$${sticker.price.toFixed(2)}</div>
-                        <div class="purchase-options">
-                            <div class="quantity-selector">
-                                <button class="qty-btn minus">-</button>
-                                <input type="text" class="qty-input" value="1">
-                                <button class="qty-btn plus">+</button>
-                            </div>
-                            <button class="add-cart-btn" data-id="${sticker.id}">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                stickerContainer.appendChild(stickerCard);
-            });
-            
-            document.querySelectorAll('.qty-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const input = this.parentElement.querySelector('.qty-input');
-                    let value = parseInt(input.value);
-                    
-                    if (this.classList.contains('plus')) {
-                        value++;
-                    } else if (this.classList.contains('minus') && value > 1) {
-                        value--;
-                    }
-                    
-                    input.value = value;
-                });
-            });
-            
-            document.querySelectorAll('.add-cart-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = parseInt(this.getAttribute('data-id'));
-                    const quantity = parseInt(this.closest('.purchase-options').querySelector('.qty-input').value);
-                    addToCart(id, quantity);
-                    const sticker = stickers.find(s => s.id === id);
-                    alert(`Added ${quantity} "${sticker.title}" sticker(s) to your cart!`);
-                    this.closest('.purchase-options').querySelector('.qty-input').value = "1";
-                });
-            });
-            
-            if (isUnlocked) {
-                document.querySelectorAll('.edit-sticker-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = parseInt(this.getAttribute('data-id'));
-                        openStickerImageUpload(id);
-                    });
-                });
-
-                document.querySelectorAll('.delete-sticker-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = parseInt(this.getAttribute('data-id'));
-                        deleteSticker(id);
-                    });
-                });
-            }
-        } catch (error) {
-            console.error("Error in renderStickers:", error);
-        }
-    }
-
     function deleteSticker(id) {
         try {
             const sticker = stickers.find(s => s.id === id);
@@ -4933,59 +5072,6 @@
             stickerUploadSection.scrollIntoView({ behavior: 'smooth' });
         } catch (error) {
             console.error("Error in openStickerImageUpload:", error);
-        }
-    }
-    
-    // RENDER GALLERY
-    function renderGallery() {
-        try {
-            const allGalleryItems = [
-                ...stickers.filter(s => s.image), 
-                ...surpriseImages
-            ];
-            
-            galleryContainer.innerHTML = '';
-            galleryDots.innerHTML = '';
-            
-            if (allGalleryItems.length === 0) {
-                galleryContainer.innerHTML = `
-                    <div class="gallery-item">
-                        <div class="gallery-image" style="background: #e4ddc6; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-images" style="font-size: 4rem; color: #757331;"></i>
-                        </div>
-                        <div class="gallery-caption">
-                            <h3>No gallery items yet</h3>
-                            <p>Add some images in the admin panel</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            allGalleryItems.forEach((item, index) => {
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item';
-                galleryItem.innerHTML = `
-                    <img src="${item.image}" alt="${item.caption}" class="gallery-image">
-                    <div class="gallery-caption">
-                        <h3>${item.caption}</h3>
-                        ${item.title ? `<p>Only $${item.price} - ${item.description}</p>` : ''}
-                    </div>
-                `;
-                galleryContainer.appendChild(galleryItem);
-                
-                const dot = document.createElement('div');
-                dot.className = `dot ${index === 0 ? 'active' : ''}`;
-                dot.setAttribute('data-index', index);
-                dot.addEventListener('click', () => {
-                    goToGallerySlide(index);
-                });
-                galleryDots.appendChild(dot);
-            });
-            
-            updateGalleryPosition();
-        } catch (error) {
-            console.error("Error in renderGallery:", error);
         }
     }
     
@@ -5068,173 +5154,6 @@
             startGalleryAutoSlide();
         } catch (error) {
             console.error("Error in resetGalleryAutoSlide:", error);
-        }
-    }
-    
-    // CART FUNCTIONS
-    function addToCart(id, quantity) {
-        try {
-            const sticker = stickers.find(s => s.id === id);
-            const existingItem = cart.find(item => item.id === id);
-            
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cart.push({
-                    id: sticker.id,
-                    title: sticker.title,
-                    price: sticker.price,
-                    quantity: quantity
-                });
-            }
-            
-            updateCart();
-        } catch (error) {
-            console.error("Error in addToCart:", error);
-            alert("There was an error adding the item to your cart. Please try again.");
-        }
-    }
-    
-    function removeFromCart(id) {
-        try {
-            cart = cart.filter(item => item.id !== id);
-            updateCart();
-        } catch (error) {
-            console.error("Error in removeFromCart:", error);
-        }
-    }
-    
-    function updateCart() {
-        try {
-            cartItems.innerHTML = '';
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<div class="cart-item">Your cart is empty</div>';
-                checkoutBtn.disabled = true;
-                checkoutBtn.style.opacity = '0.6';
-                checkoutBtn.style.cursor = 'not-allowed';
-                cartTotal.textContent = '$0.00';
-            } else {
-                let subtotal = 0;
-                
-                cart.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    subtotal += itemTotal;
-                    
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <span>${item.title} (${item.quantity}):</span>
-                        <div class="cart-item-actions">
-                            <span>$${itemTotal.toFixed(2)}</span>
-                            <button class="remove-item" data-id="${item.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    cartItems.appendChild(cartItem);
-                });
-                
-                const total = subtotal + shippingCost;
-                cartTotal.textContent = `$${total.toFixed(2)}`;
-                
-                checkoutBtn.disabled = false;
-                checkoutBtn.style.opacity = '1';
-                checkoutBtn.style.cursor = 'pointer';
-                
-                document.querySelectorAll('.remove-item').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = parseInt(this.getAttribute('data-id'));
-                        removeFromCart(id);
-                    });
-                });
-            }
-        } catch (error) {
-            console.error("Error in updateCart:", error);
-        }
-    }
-    
-    function showCheckoutForm() {
-        try {
-            checkoutForm.style.display = 'block';
-            updateCheckoutSummary();
-        } catch (error) {
-            console.error("Error in showCheckoutForm:", error);
-        }
-    }
-    
-    function hideCheckoutForm() {
-        try {
-            checkoutForm.style.display = 'none';
-        } catch (error) {
-            console.error("Error in hideCheckoutForm:", error);
-        }
-    }
-    
-    function updateCheckoutSummary() {
-        try {
-            checkoutItems.innerHTML = '';
-            
-            let subtotal = 0;
-            
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
-                
-                const checkoutItem = document.createElement('div');
-                checkoutItem.className = 'checkout-summary-item';
-                checkoutItem.innerHTML = `
-                    <span>${item.title} (${item.quantity})</span>
-                    <span>$${itemTotal.toFixed(2)}</span>
-                `;
-                checkoutItems.appendChild(checkoutItem);
-            });
-            
-            const total = subtotal + shippingCost;
-            checkoutShipping.textContent = `$${shippingCost.toFixed(2)}`;
-            checkoutTotal.textContent = `$${total.toFixed(2)}`;
-        } catch (error) {
-            console.error("Error in updateCheckoutSummary:", error);
-        }
-    }
-    
-    function processCheckout(formData) {
-        try {
-            const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
-            const order = {
-                id: orderId,
-                date: new Date().toISOString(),
-                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                status: 'processing',
-                items: [...cart],
-                customer: formData,
-                total: checkoutTotal.textContent,
-                shippingAddress: formData.address,
-                transactionId: formData.transactionId,
-                paymentMethod: currentPaymentMethod
-            };
-            
-            orders.push(order);
-            localStorage.setItem('stickerShopOrders', JSON.stringify(orders));
-            
-            if (currentUser) {
-                const userIndex = users.findIndex(u => u.id === currentUser.id);
-                if (userIndex !== -1) {
-                    users[userIndex].orders.push(orderId);
-                    localStorage.setItem('stickerShopUsers', JSON.stringify(users));
-                    currentUser.orders.push(orderId);
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                }
-            }
-            
-            cart = [];
-            updateCart();
-            hideCheckoutForm();
-            
-            alert(`Thank you for your order, ${formData.firstName}! Your order #${orderId} has been placed. Total: ${order.total}\n\nYou can track your order using the Track Order feature.`);
-        } catch (error) {
-            console.error("Error in processCheckout:", error);
-            alert("There was an error processing your order. Please try again.");
         }
     }
     
@@ -5432,6 +5351,7 @@
                     if (updatedCount > 0) {
                         renderStickers();
                         saveImagesToStorage();
+                        forceSaveAllStickerData();
                         stickerUploadSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Image applied to ${updatedCount} sticker(s)!`;
                         stickerUploadSuccess.style.display = 'block';
                         if (selectedPurchaseOption === 'single') {
@@ -5450,6 +5370,7 @@
                         stickers[stickerIndex].customImage = stickerUploadPreview.src;
                         renderStickers();
                         saveImagesToStorage();
+                        forceSaveAllStickerData();
                         const stickerName = stickers[stickerIndex].title;
                         stickerUploadSuccess.innerHTML = `<i class="fas fa-check-circle"></i> "${stickerName}" image successfully updated!`;
                         stickerUploadSuccess.style.display = 'block';
@@ -5931,6 +5852,33 @@
         }
     }
     
+    // Emergency save button for testing (can be removed later)
+    function addEmergencySaveButton() {
+        const btn = document.createElement('button');
+        btn.innerHTML = '💾 Emergency Save Images';
+        btn.style.position = 'fixed';
+        btn.style.bottom = '20px';
+        btn.style.right = '20px';
+        btn.style.zIndex = '9999';
+        btn.style.background = 'red';
+        btn.style.color = 'white';
+        btn.style.padding = '10px';
+        btn.style.borderRadius = '8px';
+        btn.style.border = 'none';
+        btn.style.cursor = 'pointer';
+        btn.onclick = function() {
+            forceSaveAllStickerData();
+            saveImagesToStorage();
+            alert('Manual save completed! Images saved to storage.');
+        };
+        document.body.appendChild(btn);
+    }
+    
     // Initialize the app
     init();
-</script> 
+    
+    // Add emergency save button (remove after testing)
+    setTimeout(addEmergencySaveButton, 2000);
+</script>
+</body>
+</html>
